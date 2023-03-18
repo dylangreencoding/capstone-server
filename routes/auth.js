@@ -22,6 +22,7 @@ router.get('/', async (request, response) => {
 
 // handle signup request
 router.post('/signup', async (request, response) => {
+  console.log('trying to sign up')
   try {
     // destructure client request
     const { email, password } = request.body;

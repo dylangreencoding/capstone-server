@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 async function addRefresh(id, refresh_token) {
-  console.log('trying to add user')
+  console.log('trying to add refresh token')
 
   const dbUrl = process.env.HARPERDB_URL;
   const dbPw = process.env.HARPERDB_PW;
