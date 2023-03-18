@@ -1,10 +1,11 @@
 const axios = require('axios');
 
-// HarperDB example code
+// from HarperDB <example code>
 // nosql operations
 // search by value
 // modified to use async/await syntax
 async function searchUsers (email) {
+  console.log('searching users')
 
   const dbUrl = process.env.HARPERDB_URL;
   const dbPw = process.env.HARPERDB_PW;
@@ -19,7 +20,10 @@ async function searchUsers (email) {
     'search_attribute' : 'email',
     search_value,
     'get_attributes' : [
-      'email'
+      'email',
+      'password',
+      'id',
+      'refresh_token'
     ]
   });
 
@@ -36,8 +40,9 @@ async function searchUsers (email) {
 
   try {
     const response = await axios(config);
-    // return string for comparison
-    return response.data[0].email
+    // return for comparison
+    // ??? is this the same as stringify/parse
+    return response.data;
   } catch (error) {
     console.log(error);
   }

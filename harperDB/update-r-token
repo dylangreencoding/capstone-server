@@ -1,10 +1,6 @@
 const axios = require('axios');
 
-// HarperDB example code
-// nosql operations
-// insert
-// modified to use async/await syntax
-async function addUser(email, password) {
+async function addRefresh(id, refresh_token) {
   console.log('trying to add user')
 
   const dbUrl = process.env.HARPERDB_URL;
@@ -12,24 +8,23 @@ async function addUser(email, password) {
   if (!dbUrl || !dbPw) return null;
 
   const data = JSON.stringify({
-    'operation': 'insert',
+    'operation': 'update',
     'schema': 'users',
     'table': 'users',
     'records': [
       {
-        email,
-        password,
-        'refresh_token': ''
+        'id': id,
+        'refresh_token': refresh_token,
       }
-    ],
+    ]
   });
 
   const config = {
     method: 'post',
-    url: dbUrl,
+    url: 'https://chat-tabletop.harperdbcloud.com',
     headers: { 
       'Content-Type': 'application/json', 
-      Authorization: dbPw,
+      'Authorization': 'Basic ZHlsYW5ncmVlbmNvZGluZzpTcGVjaWFsSzkh'
     },
     data : data
   };
@@ -40,7 +35,6 @@ async function addUser(email, password) {
   } catch (error) {
     console.log(error);
   }
-
 }
 
-module.exports = addUser;
+module.exports = addRefresh;
