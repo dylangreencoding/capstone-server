@@ -25,7 +25,7 @@ const sendAccessToken = (request, response, accessToken) => {
 
 // send refresh token to client as cookie
 const sendRefreshToken = (response, refreshToken) => {
-  response.cookie('refreshToken', refreshToken, {
+  response.cookie('refresh_token', refreshToken, {
     httpOnly: true,
   });
 };

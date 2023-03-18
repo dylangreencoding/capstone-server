@@ -1,11 +1,18 @@
 const express = require('express');
 const router = express.Router();
+// for encrypting and comparing passwords
 const { hash, compare } = require('bcryptjs');
+// for getting new access token using refresh token
+const { verify } = require('jsonwebtoken');
+//
+// middleware for protected route
+const { protected } = require('../utils/protected');
 //
 // harperDB
 const searchUsers = require('../harperDB/search-users');
-const addUser = require('../harperDB/add-user')
-const addRefresh = require('../harperDB/update-r-token')
+const addUser = require('../harperDB/add-user');
+const addRefresh = require('../harperDB/update-r-token');
+const findById = require('../harperDB/find-by-id');
 //
 // tokens
 const {
@@ -107,5 +114,122 @@ router.post('/signin', async (request, response) => {
     });
   }
 });
+
+router.post('/logout', (request, response) => {
+  // clear cookie...
+  response.clearCookie('refresh_token');
+  return response.json({
+    message: '!!! Logged out successfully !!!',
+    type: 'success',
+  });
+});
+
+// get new access token using refresh token
+router.post('/refresh_token', async (request, response) => {
+  try {
+    const { refreshToken } = request.cookies;
+    console.log(refreshToken);
+    // if no refresh token, return error
+    if (!refreshToken) {
+      return response.status(500).json({
+        message: '!!! No refresh token !!!',
+        type: 'error',
+      });
+    }
+
+    // if refresh token, verify
+    let id;
+    try {
+      id = verify(refreshToken, process.env.REFRESH_TOKEN_SECRET).id;
+      console.log(id);
+    } catch (error) {
+      return response.status(500).json({
+        message: '!!! Invalid refresh token !!!',
+        type: 'error',
+      });
+    }
+
+    // if refresh token invalid, return error
+    if (!id) {
+      return response.status(500).json({
+        message: '-!- Invalid refresh token -!-',
+        type: 'error',
+      });
+    }
+
+    // if refresh token valid, find user
+    const user = await findById(id);
+    console.log(user);
+
+    // if user does not exist, return error
+    if (user.length === 0) {
+      return response.status(500).json({
+        message: '!!! No user by that ID !!!',
+        type: 'error',
+      });
+    }
+
+    // if user exists, check if refresh token is correct
+    // if incorrect, return error
+    if (user[0].refresh_token !== refreshToken) {
+      return response.status(500).json({
+        message: '!!! Invalid refresh token !!!',
+        type: 'error',
+      });
+    }
+
+    // if refresh token correct, create new tokens
+    const accessToken = createAccessToken(user[0].id);
+    const refreshToken_ = createRefreshToken(user[0].id);
+
+    // update refresh token in user table
+    await addRefresh(user[0].id, refreshToken_);
+
+    // send new tokens response
+    sendRefreshToken(response, refreshToken_);
+    // this return is the same as the sendAccessToken function
+    // only the message is different
+    return response.json({
+      message: '!!! Refreshed successfully !!!',
+      type: 'success',
+      accessToken,
+    });
+
+  } catch (error) {
+    response.status(500).json({
+      type: 'error',
+      message: '!!! Error refreshing token !!!',
+      error,
+    });
+  }
+});
+
+// protected route
+router.get('/protected', protected, async (request, response) => {
+  try {
+    // if user in request, send data
+    if (request.user) {
+      return response.json({
+        message: '!!! You are logged in !!!',
+        type: 'success',
+        user: request.user,
+      });
+    }
+
+    // if user does not in request, return error
+    return response.status(500).json({
+      message: '!!! You are not logged in !!!',
+      type: 'error',
+    });
+  } catch (error) {
+    response.status(500).json({
+      type: 'error',
+      message: '!!! Error getting protected route !!!',
+      error,
+    });
+  }
+});
+
+
 
 module.exports = router;
