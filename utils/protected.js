@@ -1,9 +1,11 @@
 const { verify } = require('jsonwebtoken');
+const cors = require('cors');
 //
 const findById = require('../harperDB/find-by-id');
 
 // middleware function to be called before request is processed
 const protected = async (request, response, next) => {
+  // cors()
   // get token from header
   const authorization = request.headers['authorization'];
 

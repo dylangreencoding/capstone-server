@@ -41,7 +41,7 @@ router.post('/signup', async (request, response) => {
     // if user exists, return error
     if (user.length !== 0) {
       return response.status(500).json({
-        message: `User already exists. Try logging in.`,
+        message: `!!! User already exists, try logging in !!!`,
         type: 'warning',
       });
     }
@@ -54,13 +54,13 @@ router.post('/signup', async (request, response) => {
 
     // send response
     return response.status(200).json({
-      message: '!!! User created successfully',
+      message: '!!! User created successfully !!!',
       type: 'success',
     });
   } catch (error) {
     response.status(500).json({
       type: 'error',
-      message: '!!! Error creating user',
+      message: '!!! Error creating user !!!',
       error,
     });
   }
@@ -79,7 +79,7 @@ router.post('/signin', async (request, response) => {
     // if user doesn't exist, return error
     if (user.length === 0) {
       return response.status(500).json({
-        message: 'User does not exist.',
+        message: '!!! User does not exist !!!',
         type: 'error',
       });
     }
@@ -128,7 +128,7 @@ router.post('/logout', (request, response) => {
 router.post('/refresh_token', async (request, response) => {
   try {
     const { refreshToken } = request.cookies;
-    console.log(refreshToken);
+    console.log('refresh_token', refreshToken);
     // if no refresh token, return error
     if (!refreshToken) {
       return response.status(500).json({
@@ -152,7 +152,7 @@ router.post('/refresh_token', async (request, response) => {
     // if refresh token invalid, return error
     if (!id) {
       return response.status(500).json({
-        message: '-!- Invalid refresh token -!-',
+        message: '!!! Invalid refresh token !!!',
         type: 'error',
       });
     }

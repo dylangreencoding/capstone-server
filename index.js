@@ -4,6 +4,7 @@ require('dotenv').config();
 // import dependencies
 const express = require('express');
 const cookieParser = require('cookie-parser');
+const cors = require('cors');
 
 // import routes
 const indexRouter = require('./routes/index');
@@ -22,6 +23,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 // parse cookies
 app.use(cookieParser());
+// allow cross-origin requests
+app.use(cors());
 
 // add routes
 app.use('/', indexRouter);
