@@ -18,7 +18,7 @@ const createRefreshToken = (id) => {
 const sendAccessToken = (request, response, accessToken) => {
   response.json({
     accessToken,
-    message: '!!! Sign in successful !!!',
+    message: 'capstone-server-sendAccessToken: "Sign in successful"',
     type: 'success',
   });
 };

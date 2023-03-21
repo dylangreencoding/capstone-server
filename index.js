@@ -34,5 +34,5 @@ app.use('/auth', authRouter);
 // servers job is to run continuously and "listen" for requests (http or similar)
 app.listen(port, function () {
   // good practice to log
-  console.log(`!!! Listening on port ${port} !!!`);
+  console.log(`capstone-server: "Listening on port ${port} !!!"`);
 });

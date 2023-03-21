@@ -41,7 +41,7 @@ router.post('/signup', async (request, response) => {
     // if user exists, return error
     if (user.length !== 0) {
       return response.status(500).json({
-        message: `!!! User already exists, try logging in !!!`,
+        message: `capstone-server-auth/signup: "User account already exists, try logging in"`,
         type: 'warning',
       });
     }
@@ -54,13 +54,13 @@ router.post('/signup', async (request, response) => {
 
     // send response
     return response.status(200).json({
-      message: '!!! User created successfully !!!',
+      message: 'capstone-server-auth/signup: "User account created successfully"',
       type: 'success',
     });
   } catch (error) {
     response.status(500).json({
       type: 'error',
-      message: '!!! Error creating user !!!',
+      message: 'capstone-server-auth/signup: "Error creating user account"',
       error,
     });
   }
@@ -79,7 +79,7 @@ router.post('/signin', async (request, response) => {
     // if user doesn't exist, return error
     if (user.length === 0) {
       return response.status(500).json({
-        message: '!!! User does not exist !!!',
+        message: 'capstone-server-auth/signin: "User does not exist"',
         type: 'error',
       });
     }
@@ -90,7 +90,7 @@ router.post('/signin', async (request, response) => {
     // if password incorrect, return error
     if (!passwordMatch) {
       return response.status(500).json({
-        message: '!!! Password is incorrect !!!',
+        message: 'capstone-server-auth/signin: "Password is incorrect"',
         type: 'error',
       });
     }
@@ -109,7 +109,7 @@ router.post('/signin', async (request, response) => {
   } catch (error) {
     response.status(500).json({
       type: 'error',
-      message: '!!! Error signing in !!!',
+      message: 'capstone-server-auth/signin: "Error logging in"',
       error,
     });
   }
@@ -119,7 +119,7 @@ router.post('/logout', (request, response) => {
   // clear cookie...
   response.clearCookie('refresh_token');
   return response.json({
-    message: '!!! Logged out successfully !!!',
+    message: 'capstone-server-auth/logout: "Logged out successfully"',
     type: 'success',
   });
 });
@@ -132,7 +132,7 @@ router.post('/refresh_token', async (request, response) => {
     // if no refresh token, return error
     if (!refreshToken) {
       return response.status(500).json({
-        message: '!!! No refresh token !!!',
+        message: 'capstone-server-auth/refresh_token: "No refresh token"',
         type: 'error',
       });
     }
@@ -144,7 +144,7 @@ router.post('/refresh_token', async (request, response) => {
       console.log(id);
     } catch (error) {
       return response.status(500).json({
-        message: '!!! Invalid refresh token !!!',
+        message: 'capstone-server-auth/refresh_token: "Invalid refresh token"',
         type: 'error',
       });
     }
@@ -152,7 +152,7 @@ router.post('/refresh_token', async (request, response) => {
     // if refresh token invalid, return error
     if (!id) {
       return response.status(500).json({
-        message: '!!! Invalid refresh token !!!',
+        message: 'capstone-server-auth/refresh_token: "Invalid refresh token"',
         type: 'error',
       });
     }
@@ -164,7 +164,7 @@ router.post('/refresh_token', async (request, response) => {
     // if user does not exist, return error
     if (user.length === 0) {
       return response.status(500).json({
-        message: '!!! No user by that ID !!!',
+        message: 'capstone-server-auth/refresh_token: "No user by that ID"',
         type: 'error',
       });
     }
@@ -173,7 +173,7 @@ router.post('/refresh_token', async (request, response) => {
     // if incorrect, return error
     if (user[0].refresh_token !== refreshToken) {
       return response.status(500).json({
-        message: '!!! Invalid refresh token !!!',
+        message: 'capstone-server-auth/refresh_token: "Invalid refresh token"',
         type: 'error',
       });
     }
@@ -190,7 +190,7 @@ router.post('/refresh_token', async (request, response) => {
     // this return is the same as the sendAccessToken function
     // only the message is different
     return response.json({
-      message: '!!! Refreshed successfully !!!',
+      message: 'capstone-server-auth/refresh_token: "Refreshed successfully"',
       type: 'success',
       accessToken,
     });
@@ -198,7 +198,7 @@ router.post('/refresh_token', async (request, response) => {
   } catch (error) {
     response.status(500).json({
       type: 'error',
-      message: '!!! Error refreshing token !!!',
+      message: 'capstone-server-auth/refresh_token: "Error refreshing token"',
       error,
     });
   }
@@ -210,7 +210,7 @@ router.get('/protected', protected, async (request, response) => {
     // if user in request, send data
     if (request.user) {
       return response.json({
-        message: '!!! You are logged in !!!',
+        message: 'capstone-server-auth/protected: "You are logged in"',
         type: 'success',
         user: request.user,
       });
@@ -218,13 +218,13 @@ router.get('/protected', protected, async (request, response) => {
 
     // if user does not in request, return error
     return response.status(500).json({
-      message: '!!! You are not logged in !!!',
+      message: 'capstone-server-auth/refresh_token: "You are not logged in"',
       type: 'error',
     });
   } catch (error) {
     response.status(500).json({
       type: 'error',
-      message: '!!! Error getting protected route !!!',
+      message: 'capstone-server-auth/refresh_token: "Error getting protected route"',
       error,
     });
   }

@@ -12,7 +12,7 @@ const protected = async (request, response, next) => {
   // if no token, return error
   if (!authorization) {
     return response.status(500).json({
-      message: '!!! No token !!!',
+      message: 'capstone-server-protected-middleware: "No token"',
       type: 'error',
     });
   }
@@ -24,7 +24,7 @@ const protected = async (request, response, next) => {
     id = verify(token, process.env.ACCESS_TOKEN_SECRET).id;
   } catch {
     return response.status(500).json({
-      message: '!!! Invalid token !!!',
+      message: 'capstone-server-protected-middleware: "Invalid token"',
       type: 'error',
     });
   }
@@ -32,7 +32,7 @@ const protected = async (request, response, next) => {
   // if token invalid, return error
   if (!id) {
     return response.status(500).json({
-      message: '!!! Invalid token !!!',
+      message: 'capstone-server-protected-middleware: "Invalid token"',
       type: 'error',
     });
   }
@@ -43,7 +43,7 @@ const protected = async (request, response, next) => {
   // if user does not exist, return error
   if (user.length === 0) {
     return response.status(500).json({
-      message: '!!! No user by that ID !!!',
+      message: 'capstone-server-protected-middleware: "No user by that ID"',
       type: 'error',
     });
   }
