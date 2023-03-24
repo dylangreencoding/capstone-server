@@ -263,20 +263,20 @@ router.post('/new-map', protected, async (request, response) => {
       }
 
       return response.json({
-        message: 'capstone-server-auth/save-map: "Map saved successfully"',
+        message: 'capstone-server-auth/new-map: "Map saved successfully"',
         type: 'success',
         map: request.body
       })
     }
     // if user not in request, return error
     return response.status(500).json({
-      message: 'capstone-server-auth/save-map: "You are not logged in"',
+      message: 'capstone-server-auth/new-map: "You are not logged in"',
       type: 'error',
     });
   } catch (error) {
     response.status(500).json({
       type: 'error',
-      message: 'capstone-server-auth/save-map: "Error getting protected route"',
+      message: 'capstone-server-auth/new-map: "Error getting protected route"',
       error,
     });
   }
@@ -292,7 +292,7 @@ router.post('/delete-map', protected, async (request, response) => {
       await deleteMap(request.body);
 
       return response.json({
-        message: 'capstone-server-auth/retrieve-map: "Map retrieved successfully"',
+        message: 'capstone-server-auth/retrieve-map: "Map deleted successfully"',
         type: 'success',
         map: request.body,
       })
