@@ -18,6 +18,8 @@ const findById = require('../harperDB/find-by-id');
 const addMap = require('../harperDB/add-map');
 const findMap = require('../harperDB/find-map');
 const getAllMaps = require('../harperDB/get-all-maps');
+const updateMap = require('../harperDB/update-map');
+const deleteMap = require('../harperDB/delete-map')
 //
 // tokens
 const {
@@ -249,22 +251,21 @@ router.get('/protected', protected, async (request, response) => {
 router.post('/new-map', protected, async (request, response) => {
   try {
     if (request.user) {
-      let map_;
+      console.log('REQUEST', request.user)
+
       if (request.body.id === '') {
-        console.log('NO MAP ID')
-        const mapId = await addMap(request.body);
-        console.log(mapId.inserted_hashes[0])
-        map_ = await findMap(mapId.inserted_hashes[0]);
-        console.log('FOUND MAP', map_[0])
+        console.log('ADDING MAP')
+        await addMap(request.body);
       } else {
-        console.log('MAP ID')
-        map_ = await findMap(mapId.inserted_hashes[0]);
+        console.log('UPDATING MAP')
+        await updateMap(request.body);
+        
       }
 
       return response.json({
         message: 'capstone-server-auth/save-map: "Map saved successfully"',
         type: 'success',
-        map: map_[0]
+        map: request.body
       })
     }
     // if user not in request, return error
@@ -282,16 +283,18 @@ router.post('/new-map', protected, async (request, response) => {
 })
 
 // retrieve map
-router.post('/retrieve-map', protected, async (request, response) => {
+router.post('/delete-map', protected, async (request, response) => {
   try {
+    console.log('REQUEST', request.user)
     if (request.user) {
 
-      // HERE: POST (retrieve) map from harperDB
+      console.log('DELETING MAP')
+      await deleteMap(request.body);
 
       return response.json({
         message: 'capstone-server-auth/retrieve-map: "Map retrieved successfully"',
         type: 'success',
-        map: 'HERE: return map with response',
+        map: request.body,
       })
     }
     // if user not in request, return error
