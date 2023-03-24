@@ -6,7 +6,7 @@ const findById = require('../harperDB/find-by-id');
 // middleware function to be called before request is processed
 const protected = async (request, response, next) => {
   // cors()
-  // get token from header
+  // get token from request header
   const authorization = request.headers['authorization'];
 
   // if no token, return error
@@ -43,7 +43,7 @@ const protected = async (request, response, next) => {
   // if user does not exist, return error
   if (user.length === 0) {
     return response.status(500).json({
-      message: 'capstone-server-protected-middleware: "No user by that ID"',
+      message: 'capstone-server-protected-middleware: "User not found"',
       type: 'error',
     });
   }

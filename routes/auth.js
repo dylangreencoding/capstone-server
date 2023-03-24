@@ -9,10 +9,15 @@ const { verify } = require('jsonwebtoken');
 const { protected } = require('../utils/protected');
 //
 // harperDB
+// TODO: rename these better
 const searchUsers = require('../harperDB/search-users');
 const addUser = require('../harperDB/add-user');
 const addRefresh = require('../harperDB/update-r-token');
 const findById = require('../harperDB/find-by-id');
+
+const addMap = require('../harperDB/add-map');
+const findMap = require('../harperDB/find-map');
+const getAllMaps = require('../harperDB/get-all-maps');
 //
 // tokens
 const {
@@ -22,6 +27,7 @@ const {
   sendRefreshToken,
 } = require('../utils/tokens');
 
+// basic route
 // for demonstration and clarity
 router.get('/', async (request, response) => {
   response.send(`/auth endpoint`);
@@ -164,7 +170,7 @@ router.post('/refresh_token', async (request, response) => {
     // if user does not exist, return error
     if (user.length === 0) {
       return response.status(500).json({
-        message: 'capstone-server-auth/refresh_token: "No user by that ID"',
+        message: 'capstone-server-auth/refresh_token: "User not found"',
         type: 'error',
       });
     }
@@ -187,6 +193,7 @@ router.post('/refresh_token', async (request, response) => {
 
     // send new tokens response
     sendRefreshToken(response, refreshToken_);
+
     // this return is the same as the sendAccessToken function
     // only the message is different
     return response.json({
@@ -209,14 +216,21 @@ router.get('/protected', protected, async (request, response) => {
   try {
     // if user in request, send data
     if (request.user) {
+      
+      // take a look at request.user
+      console.log(request.user[0].id);
+      const maps = await getAllMaps(request.user[0].id);
+      console.log(maps);
+
       return response.json({
         message: 'capstone-server-auth/protected: "You are logged in"',
         type: 'success',
         user: request.user,
+        maps: maps
       });
     }
 
-    // if user does not in request, return error
+    // if user not in request, return error
     return response.status(500).json({
       message: 'capstone-server-auth/refresh_token: "You are not logged in"',
       type: 'error',
@@ -229,6 +243,71 @@ router.get('/protected', protected, async (request, response) => {
     });
   }
 });
+
+
+// save map
+router.post('/new-map', protected, async (request, response) => {
+  try {
+    if (request.user) {
+      let map_;
+      if (request.body.id === '') {
+        console.log('NO MAP ID')
+        const mapId = await addMap(request.body);
+        console.log(mapId.inserted_hashes[0])
+        map_ = await findMap(mapId.inserted_hashes[0]);
+        console.log('FOUND MAP', map_[0])
+      } else {
+        console.log('MAP ID')
+        map_ = await findMap(mapId.inserted_hashes[0]);
+      }
+
+      return response.json({
+        message: 'capstone-server-auth/save-map: "Map saved successfully"',
+        type: 'success',
+        map: map_[0]
+      })
+    }
+    // if user not in request, return error
+    return response.status(500).json({
+      message: 'capstone-server-auth/save-map: "You are not logged in"',
+      type: 'error',
+    });
+  } catch (error) {
+    response.status(500).json({
+      type: 'error',
+      message: 'capstone-server-auth/save-map: "Error getting protected route"',
+      error,
+    });
+  }
+})
+
+// retrieve map
+router.post('/retrieve-map', protected, async (request, response) => {
+  try {
+    if (request.user) {
+
+      // HERE: POST (retrieve) map from harperDB
+
+      return response.json({
+        message: 'capstone-server-auth/retrieve-map: "Map retrieved successfully"',
+        type: 'success',
+        map: 'HERE: return map with response',
+      })
+    }
+    // if user not in request, return error
+    return response.status(500).json({
+      message: 'capstone-server-auth/retrieve-map: "You are not logged in"',
+      type: 'error',
+    });
+  } catch (error) {
+    response.status(500).json({
+      type: 'error',
+      message: 'capstone-server-auth/retrieve-map: "Error getting protected route"',
+      error,
+    });
+  }
+})
+
 
 
 
