@@ -11,13 +11,12 @@ const { protected } = require('../utils/protected');
 // harperDB
 // TODO: rename these better
 const searchUsers = require('../harperDB/search-users');
-const addUser = require('../harperDB/add-user');
+const addUser = require('../harperDB/create-user');
+const findUser = require('../harperDB/find-user');
 const addRefresh = require('../harperDB/update-r-token');
-const findById = require('../harperDB/find-by-id');
 
-const addMap = require('../harperDB/add-map');
-const findMap = require('../harperDB/find-map');
 const getAllMaps = require('../harperDB/get-all-maps');
+const addMap = require('../harperDB/create-map');
 const updateMap = require('../harperDB/update-map');
 const deleteMap = require('../harperDB/delete-map')
 //
@@ -36,8 +35,8 @@ router.get('/', async (request, response) => {
 });
 
 // handle signup request
-router.post('/signup', async (request, response) => {
-  console.log('trying to sign up')
+router.post('/create-account', async (request, response) => {
+  console.log('trying to create account')
   try {
     // destructure client request
     const { email, password } = request.body;
@@ -49,7 +48,7 @@ router.post('/signup', async (request, response) => {
     // if user exists, return error
     if (user.length !== 0) {
       return response.status(500).json({
-        message: `capstone-server-auth/signup: "User account already exists, try logging in"`,
+        message: `capstone-server-auth/create-account: "User account already exists, try logging in"`,
         type: 'warning',
       });
     }
@@ -62,21 +61,21 @@ router.post('/signup', async (request, response) => {
 
     // send response
     return response.status(200).json({
-      message: 'capstone-server-auth/signup: "User account created successfully"',
+      message: 'capstone-server-auth/create-account: "User account created successfully"',
       type: 'success',
     });
   } catch (error) {
     response.status(500).json({
       type: 'error',
-      message: 'capstone-server-auth/signup: "Error creating user account"',
+      message: 'capstone-server-auth/create-account: "Error creating user account"',
       error,
     });
   }
 });
 
 // handle signin request
-router.post('/signin', async (request, response) => {
-  console.log('trying to sign in')
+router.post('/login', async (request, response) => {
+  console.log('trying to log in')
   try {
     const { email, password } = request.body;
 
@@ -87,7 +86,7 @@ router.post('/signin', async (request, response) => {
     // if user doesn't exist, return error
     if (user.length === 0) {
       return response.status(500).json({
-        message: 'capstone-server-auth/signin: "User does not exist"',
+        message: 'capstone-server-auth/login: "User does not exist"',
         type: 'error',
       });
     }
@@ -98,7 +97,7 @@ router.post('/signin', async (request, response) => {
     // if password incorrect, return error
     if (!passwordMatch) {
       return response.status(500).json({
-        message: 'capstone-server-auth/signin: "Password is incorrect"',
+        message: 'capstone-server-auth/login: "Password is incorrect"',
         type: 'error',
       });
     }
@@ -117,7 +116,7 @@ router.post('/signin', async (request, response) => {
   } catch (error) {
     response.status(500).json({
       type: 'error',
-      message: 'capstone-server-auth/signin: "Error logging in"',
+      message: 'capstone-server-auth/login: "Error logging in"',
       error,
     });
   }
@@ -166,7 +165,7 @@ router.post('/refresh_token', async (request, response) => {
     }
 
     // if refresh token valid, find user
-    const user = await findById(id);
+    const user = await findUser(id);
     console.log(user);
 
     // if user does not exist, return error
@@ -213,7 +212,8 @@ router.post('/refresh_token', async (request, response) => {
   }
 });
 
-// protected route
+// main protected route
+// returns user data
 router.get('/protected', protected, async (request, response) => {
   try {
     // if user in request, send data
@@ -234,55 +234,55 @@ router.get('/protected', protected, async (request, response) => {
 
     // if user not in request, return error
     return response.status(500).json({
-      message: 'capstone-server-auth/refresh_token: "You are not logged in"',
+      message: 'capstone-server-auth/protected: "You are not logged in"',
       type: 'error',
     });
   } catch (error) {
     response.status(500).json({
       type: 'error',
-      message: 'capstone-server-auth/refresh_token: "Error getting protected route"',
+      message: 'capstone-server-auth/protected: "Error getting protected route"',
       error,
     });
   }
 });
 
 
-// save map
-router.post('/new-map', protected, async (request, response) => {
+// creates/updates maps
+router.post('/save-map', protected, async (request, response) => {
   try {
     if (request.user) {
-      console.log('REQUEST', request.user)
+      console.log('request', request.user)
 
       if (request.body.id === '') {
-        console.log('ADDING MAP')
+        console.log('no map id, adding map')
         await addMap(request.body);
+
       } else {
-        console.log('UPDATING MAP')
+        console.log('map id, updating map')
         await updateMap(request.body);
-        
       }
 
       return response.json({
-        message: 'capstone-server-auth/new-map: "Map saved successfully"',
+        message: 'capstone-server-auth/save-map: "Map saved successfully"',
         type: 'success',
         map: request.body
       })
     }
     // if user not in request, return error
     return response.status(500).json({
-      message: 'capstone-server-auth/new-map: "You are not logged in"',
+      message: 'capstone-server-auth/save-map: "You are not logged in"',
       type: 'error',
     });
   } catch (error) {
     response.status(500).json({
       type: 'error',
-      message: 'capstone-server-auth/new-map: "Error getting protected route"',
+      message: 'capstone-server-auth/save-map: "Error getting protected route"',
       error,
     });
   }
 })
 
-// retrieve map
+// deletes map
 router.post('/delete-map', protected, async (request, response) => {
   try {
     console.log('REQUEST', request.user)
@@ -292,20 +292,20 @@ router.post('/delete-map', protected, async (request, response) => {
       await deleteMap(request.body);
 
       return response.json({
-        message: 'capstone-server-auth/retrieve-map: "Map deleted successfully"',
+        message: 'capstone-server-auth/delete-map: "Map deleted successfully"',
         type: 'success',
         map: request.body,
       })
     }
     // if user not in request, return error
     return response.status(500).json({
-      message: 'capstone-server-auth/retrieve-map: "You are not logged in"',
+      message: 'capstone-server-auth/delete-map: "You are not logged in"',
       type: 'error',
     });
   } catch (error) {
     response.status(500).json({
       type: 'error',
-      message: 'capstone-server-auth/retrieve-map: "Error getting protected route"',
+      message: 'capstone-server-auth/delete-map: "Error getting protected route"',
       error,
     });
   }

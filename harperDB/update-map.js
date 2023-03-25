@@ -23,8 +23,8 @@ async function updateMap(map) {
         'tool': map.tool,
         'width': map.width,
         'height': map.height,
-        'walls': map.walls,
-        'zombies': map.zombies,
+        'lines': map.lines,
+        'locations': map.locations,
       }
     ]
   });
