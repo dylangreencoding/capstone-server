@@ -19,12 +19,7 @@ async function searchUsers (email) {
     'table' : 'users',
     'search_attribute' : 'email',
     search_value,
-    'get_attributes' : [
-      'email',
-      'password',
-      'id',
-      'refresh_token'
-    ]
+    'get_attributes' : ['*'],
   });
 
   const config = {
@@ -40,8 +35,7 @@ async function searchUsers (email) {
 
   try {
     const response = await axios(config);
-    // return for comparison
-    // ??? is this the same as stringify/parse
+    console.log('WTF', response.data)
     return response.data;
   } catch (error) {
     console.log(error);

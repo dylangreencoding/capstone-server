@@ -19,7 +19,7 @@ async function addUser(email, password) {
       {
         email,
         password,
-        'refresh_token': ''
+        'refresh_token': '',
       }
     ],
   });

@@ -69,6 +69,7 @@ router.post('/create-account', async (request, response) => {
       type: 'error',
       message: 'capstone-server-auth/create-account: "Error creating user account"',
       error,
+      data: request.body
     });
   }
 });
@@ -218,7 +219,7 @@ router.get('/protected', protected, async (request, response) => {
   try {
     // if user in request, send data
     if (request.user) {
-      
+
       // take a look at request.user
       console.log(request.user[0].id);
       const maps = await getAllMaps(request.user[0].id);
