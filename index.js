@@ -18,7 +18,8 @@ const app = express();
 
 // add middleware to 
 // parse request body as JSON
-app.use(express.json());
+// default request body size limit is 100kb to prevent attacks of some sort ??
+app.use(express.json({ limit: '2mb' }));
 // parse request body as query string
 app.use(express.urlencoded({ extended: false }));
 // parse cookies
