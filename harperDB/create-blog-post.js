@@ -4,7 +4,7 @@ const axios = require('axios');
 // nosql operations
 // insert
 // modified to use async/await syntax
-async function addBlogPost(blogPost) {
+async function addBlogPost(blogTitle, blogBody) {
   console.log('trying to add blog post to db')
 
   const dbUrl = process.env.HARPERDB_URL;
@@ -16,7 +16,10 @@ async function addBlogPost(blogPost) {
     'schema': 'blog',
     'table': 'posts',
     'records': [
-      { blogPost }
+      {
+        blogTitle,
+        blogBody
+      }
     ],
   });
 

@@ -10,10 +10,10 @@ router.post('/create-post', async (request, response) => {
   console.log('trying to create blog post')
   try {
     // destructure client request
-    const { blogPost } = request.body;
+    const { blogTitle, blogBody } = request.body;
 
     // add to db
-    await addBlogPost(blogPost);
+    await addBlogPost(blogTitle, blogBody);
 
     // send response
     return response.status(200).json({
