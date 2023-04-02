@@ -25,7 +25,6 @@ async function updateMap(map) {
         'width': map.width,
         'height': map.height,
         'lines': map.lines,
-        'locations': map.locations,
       }
     ]
   });

@@ -18,8 +18,7 @@ async function updateChar(char) {
         'name': char.name,
         'x': char.x,
         'y': char.y,
-        'speed': char.speed,
-        'status': char.status
+        'level': char.level,
       }
     ]
   });
