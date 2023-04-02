@@ -18,7 +18,12 @@ const addRefresh = require('../harperDB/update-r-token');
 const getAllMaps = require('../harperDB/get-all-maps');
 const addMap = require('../harperDB/create-map');
 const updateMap = require('../harperDB/update-map');
-const deleteMap = require('../harperDB/delete-map')
+const deleteMap = require('../harperDB/delete-map');
+
+const getAllChars = require('../harperDB/get-all-chars')
+const createChar = require('../harperDB/create-char');
+const updateChar = require('../harperDB/update-char');
+const deleteChar = require('../harperDB/delete-char');
 //
 // tokens
 const {
@@ -222,14 +227,16 @@ router.get('/protected', protected, async (request, response) => {
 
       // take a look at request.user
       console.log(request.user[0].id);
+
       const maps = await getAllMaps(request.user[0].id);
-      console.log(maps);
+      const chars = await getAllChars(request.user[0].id);
 
       return response.json({
         message: 'capstone-server-auth/protected: "You are logged in"',
         type: 'success',
         user: request.user,
-        maps: maps
+        maps: maps,
+        chars: chars
       });
     }
 
@@ -307,6 +314,70 @@ router.post('/delete-map', protected, async (request, response) => {
     response.status(500).json({
       type: 'error',
       message: 'capstone-server-auth/delete-map: "Error getting protected route"',
+      error,
+    });
+  }
+})
+
+// creates/updates characters
+router.post('/save-char', protected, async (request, response) => {
+  try {
+    if (request.user) {
+      console.log('request', request.user)
+
+      if (request.body.id === '') {
+        console.log('no char id, adding char')
+        await createChar(request.body);
+
+      } else {
+        console.log('char id found, updating char')
+        await updateChar(request.body);
+      }
+
+      return response.json({
+        message: 'capstone-server-auth/save-char: "Character saved successfully"',
+        type: 'success',
+        map: request.body
+      })
+    }
+    // if user not in request, return error
+    return response.status(500).json({
+      message: 'capstone-server-auth/save-char: "You are not logged in"',
+      type: 'error',
+    });
+  } catch (error) {
+    response.status(500).json({
+      type: 'error',
+      message: 'capstone-server-auth/save-char: "Error getting protected route"',
+      error,
+    });
+  }
+})
+
+// deletes characters
+router.post('/delete-char', protected, async (request, response) => {
+  try {
+    console.log('REQUEST', request.user)
+    if (request.user) {
+
+      console.log('DELETING CHARACTER')
+      await deleteChar(request.body);
+
+      return response.json({
+        message: 'capstone-server-auth/delete-char: "Character deleted successfully"',
+        type: 'success',
+        map: request.body,
+      })
+    }
+    // if user not in request, return error
+    return response.status(500).json({
+      message: 'capstone-server-auth/delete-char: "You are not logged in"',
+      type: 'error',
+    });
+  } catch (error) {
+    response.status(500).json({
+      type: 'error',
+      message: 'capstone-server-auth/delete-char: "Error getting protected route"',
       error,
     });
   }
