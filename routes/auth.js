@@ -405,7 +405,7 @@ router.post('/save-game', protected, async (request, response) => {
         await addGameToUser(request.user[0], game.inserted_hashes[0]);
 
       } else {
-        console.log('game id found, updating game')
+        console.log('game id found, updating game');
         await updateGame(request.body);
       }
 
@@ -462,5 +462,32 @@ router.post('/delete-game', protected, async (request, response) => {
   }
 })
 
+// join game
+router.post('/join-game', protected, async (request, response) => {
+  try {
+    console.log('REQUEST', request.user)
+    if (request.user) {
+
+      console.log(request.body.id);
+      await addGameToUser(request.user[0], request.body.id);
+
+      return response.json({
+        message: 'capstone-server-auth/join-game: "Game joined successfully"',
+        type: 'success',
+      })
+    }
+    // if user not in request, return error
+    return response.status(500).json({
+      message: 'capstone-server-auth/join-game: "You are not logged in"',
+      type: 'error',
+    });
+  } catch (error) {
+    response.status(500).json({
+      type: 'error',
+      message: 'capstone-server-auth/join-game: "Error getting protected route"',
+      error,
+    });
+  }
+})
 
 module.exports = router;

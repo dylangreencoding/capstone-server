@@ -25,7 +25,8 @@ async function updateGame(game) {
         'width': game.width,
         'height': game.height,
         'lines': game.lines,
-        'players': game.players
+        'players': game.players,
+        'messages': game.messages,
       }
     ]
   });
