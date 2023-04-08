@@ -4,8 +4,8 @@ const axios = require('axios');
 // nosql operations
 // insert
 // modified to use async/await syntax
-async function createMap(map) {
-  console.log('trying to add map to db')
+async function createGame(game) {
+  console.log('trying to add game to db')
 
   const dbUrl = process.env.HARPERDB_URL;
   const dbPw = process.env.HARPERDB_PW;
@@ -14,9 +14,9 @@ async function createMap(map) {
   const data = JSON.stringify({
     'operation': 'insert',
     'schema': 'users',
-    'table': 'maps',
+    'table': 'games',
     'records': [
-      map
+      game
     ],
   });
 
@@ -32,10 +32,10 @@ async function createMap(map) {
 
   try {
     const response = await axios(config);
-    console.log(response.data)
+    return response.data
   } catch (error) {
     console.log(error);
   }
 }
 
-module.exports = createMap;
+module.exports = createGame;

@@ -1,23 +1,37 @@
 const axios = require('axios');
 
-// HarperDB example code
-// nosql operations
-// insert
-// modified to use async/await syntax
-async function createMap(map) {
-  console.log('trying to add map to db')
+async function removeGameFromUser(user, game) {
+  console.log('trying to remove game from user')
+  
+  const gameId = game.id
+  const games = user.games.filter((game) => {
+    return game != gameId;
+  });
+
+  // const gameId = game.id
+  // let games = []
+  // for (const game of user.games) {
+  //   if (game !== gameId) {
+  //     games.push(game);
+  //   }
+  // }
+
+  console.log(games)
 
   const dbUrl = process.env.HARPERDB_URL;
   const dbPw = process.env.HARPERDB_PW;
   if (!dbUrl || !dbPw) return null;
 
   const data = JSON.stringify({
-    'operation': 'insert',
+    'operation': 'update',
     'schema': 'users',
-    'table': 'maps',
+    'table': 'users',
     'records': [
-      map
-    ],
+      {
+        'id': user.id,
+        games
+      }
+    ]
   });
 
   const config = {
@@ -38,4 +52,4 @@ async function createMap(map) {
   }
 }
 
-module.exports = createMap;
+module.exports = removeGameFromUser;

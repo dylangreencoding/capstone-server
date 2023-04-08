@@ -1,28 +1,33 @@
 const axios = require('axios');
 
-// HarperDB example code
-// nosql operations
-// insert
-// modified to use async/await syntax
-async function addUser(email, password) {
-  console.log('trying to add user')
+async function updateGame(game) {
+  console.log('trying to update game')
 
   const dbUrl = process.env.HARPERDB_URL;
   const dbPw = process.env.HARPERDB_PW;
   if (!dbUrl || !dbPw) return null;
 
   const data = JSON.stringify({
-    'operation': 'insert',
+    'operation': 'update',
     'schema': 'users',
-    'table': 'users',
+    'table': 'games',
     'records': [
       {
-        email,
-        password,
-        'refresh_token': '',
-        games: [],
+        'id': game.id,
+        'maker': game.maker,
+        'name': game.name,
+        'x': game.x,
+        'y': game.y,
+        'scale': game.scale,
+        'selected': game.selected,
+        'selectFrom': game.selectFrom,
+        'tool': game.tool,
+        'width': game.width,
+        'height': game.height,
+        'lines': game.lines,
+        'players': game.players
       }
-    ],
+    ]
   });
 
   const config = {
@@ -41,7 +46,6 @@ async function addUser(email, password) {
   } catch (error) {
     console.log(error);
   }
-
 }
 
-module.exports = addUser;
+module.exports = updateGame;

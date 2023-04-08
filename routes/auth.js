@@ -16,14 +16,21 @@ const findUser = require('../harperDB/find-user');
 const addRefresh = require('../harperDB/update-r-token');
 
 const getAllMaps = require('../harperDB/get-all-maps');
-const addMap = require('../harperDB/create-map');
+const createMap = require('../harperDB/create-map');
 const updateMap = require('../harperDB/update-map');
 const deleteMap = require('../harperDB/delete-map');
 
-const getAllChars = require('../harperDB/get-all-chars')
+const getAllChars = require('../harperDB/get-all-chars');
 const createChar = require('../harperDB/create-char');
 const updateChar = require('../harperDB/update-char');
 const deleteChar = require('../harperDB/delete-char');
+
+const getAllGames = require('../harperDB/get-all-games');
+const createGame = require('../harperDB/create-game');
+const updateGame = require('../harperDB/update-game');
+const deleteGame = require('../harperDB/delete-game');
+const addGameToUser = require('../harperDB/add-game-to-user');
+const removeGameFromUser = require('../harperDB/remove-game-from-user');
 //
 // tokens
 const {
@@ -230,13 +237,15 @@ router.get('/protected', protected, async (request, response) => {
 
       const maps = await getAllMaps(request.user[0].id);
       const chars = await getAllChars(request.user[0].id);
+      const games = await getAllGames(request.user[0]);
 
       return response.json({
         message: 'capstone-server-auth/protected: "You are logged in"',
         type: 'success',
         user: request.user,
         maps: maps,
-        chars: chars
+        chars: chars,
+        games: games,
       });
     }
 
@@ -263,7 +272,7 @@ router.post('/save-map', protected, async (request, response) => {
 
       if (request.body.id === '') {
         console.log('no map id, adding map')
-        await addMap(request.body);
+        await createMap(request.body);
 
       } else {
         console.log('map id, updating map')
@@ -337,7 +346,7 @@ router.post('/save-char', protected, async (request, response) => {
       return response.json({
         message: 'capstone-server-auth/save-char: "Character saved successfully"',
         type: 'success',
-        map: request.body
+        char: request.body
       })
     }
     // if user not in request, return error
@@ -366,7 +375,7 @@ router.post('/delete-char', protected, async (request, response) => {
       return response.json({
         message: 'capstone-server-auth/delete-char: "Character deleted successfully"',
         type: 'success',
-        map: request.body,
+        char: request.body,
       })
     }
     // if user not in request, return error
@@ -383,7 +392,75 @@ router.post('/delete-char', protected, async (request, response) => {
   }
 })
 
+// creates/updates games
+router.post('/save-game', protected, async (request, response) => {
+  try {
+    if (request.user) {
+      console.log('request', request.user)
 
+      if (request.body.id === '') {
+        console.log('no game id, adding game')
+        const game = await createGame(request.body);
+
+        await addGameToUser(request.user[0], game.inserted_hashes[0]);
+
+      } else {
+        console.log('game id found, updating game')
+        await updateGame(request.body);
+      }
+
+      return response.json({
+        message: 'capstone-server-auth/save-game: "Game saved successfully"',
+        type: 'success',
+        game: request.body
+      })
+    }
+    // if user not in request, return error
+    return response.status(500).json({
+      message: 'capstone-server-auth/save-game: "You are not logged in"',
+      type: 'error',
+    });
+  } catch (error) {
+    response.status(500).json({
+      type: 'error',
+      message: 'capstone-server-auth/save-game: "Error getting protected route"',
+      error,
+    });
+  }
+})
+
+// deletes game
+router.post('/delete-game', protected, async (request, response) => {
+  try {
+    console.log('REQUEST', request.user)
+    if (request.user) {
+
+      console.log('DELETING GAME')
+      await deleteGame(request.body);
+      console.log('HERE')
+      console.log('HERE')
+
+      await removeGameFromUser(request.user[0], request.body);
+
+      return response.json({
+        message: 'capstone-server-auth/delete-game: "Game deleted successfully"',
+        type: 'success',
+        game: request.body,
+      })
+    }
+    // if user not in request, return error
+    return response.status(500).json({
+      message: 'capstone-server-auth/delete-game: "You are not logged in"',
+      type: 'error',
+    });
+  } catch (error) {
+    response.status(500).json({
+      type: 'error',
+      message: 'capstone-server-auth/delete-game: "Error getting protected route"',
+      error,
+    });
+  }
+})
 
 
 module.exports = router;

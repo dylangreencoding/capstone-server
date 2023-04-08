@@ -5,7 +5,6 @@ const axios = require('axios');
 // search by value
 // modified to use async/await syntax
 async function findById (id) {
-  console.log('finding by id')
 
   const dbUrl = process.env.HARPERDB_URL;
   const dbPw = process.env.HARPERDB_PW;
@@ -22,7 +21,8 @@ async function findById (id) {
       'email',
       'password',
       'id',
-      'refresh_token'
+      'refresh_token',
+      'games'
     ]
   });
 
