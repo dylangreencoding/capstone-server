@@ -31,6 +31,10 @@ const updateGame = require('../harperDB/update-game');
 const deleteGame = require('../harperDB/delete-game');
 const addGameToUser = require('../harperDB/add-game-to-user');
 const removeGameFromUser = require('../harperDB/remove-game-from-user');
+const removeUserFromGame = require('../harperDB/remove-user-from-game');
+const findGame = require('../harperDB/find-game');
+const joinGame = require('../harperDB/join-game');
+
 //
 // tokens
 const {
@@ -432,15 +436,20 @@ router.post('/save-game', protected, async (request, response) => {
 // deletes game
 router.post('/delete-game', protected, async (request, response) => {
   try {
-    console.log('REQUEST', request.user)
+
     if (request.user) {
-
-      console.log('DELETING GAME')
-      await deleteGame(request.body);
-      console.log('HERE')
-      console.log('HERE')
-
-      await removeGameFromUser(request.user[0], request.body);
+     
+      
+      const game = request.body;
+      const userId = request.user[0].id;
+      if (game.players[userId] === 'host' && Object.keys(game.players).length === 1) {
+        await removeUserFromGame(request.user[0], request.body);
+        await removeGameFromUser(request.user[0], request.body);
+        await deleteGame(request.body);
+      } else if (game.players[userId] === 'guest') {
+        await removeUserFromGame(request.user[0], request.body);
+        await removeGameFromUser(request.user[0], request.body);
+      }
 
       return response.json({
         message: 'capstone-server-auth/delete-game: "Game deleted successfully"',
@@ -468,13 +477,28 @@ router.post('/join-game', protected, async (request, response) => {
     console.log('REQUEST', request.user)
     if (request.user) {
 
-      console.log(request.body.id);
-      await addGameToUser(request.user[0], request.body.id);
+      let game = await findGame(request.body.id);
+      const user = request.user[0];
 
-      return response.json({
-        message: 'capstone-server-auth/join-game: "Game joined successfully"',
-        type: 'success',
-      })
+      if (game.length === 1 && !user.games.includes(request.body.id)) {
+        await addGameToUser(request.user[0], request.body.id);
+        game[0].players[user.id] = 'guest';
+        await joinGame(game[0]);
+        game = await findGame(request.body.id);
+
+
+        return response.json({
+          message: 'capstone-server-auth/join-game: "Game joined successfully"',
+          type: 'success',
+          game: game,
+        })
+      } else {
+        // if game not found, return error
+        return response.status(500).json({
+          message: 'capstone-server-auth/join-game: "No game by that id"',
+          type: 'error',
+    });
+      }
     }
     // if user not in request, return error
     return response.status(500).json({

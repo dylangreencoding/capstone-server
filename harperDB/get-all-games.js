@@ -6,10 +6,12 @@ async function getAllGames(user) {
   if (!dbUrl || !dbPw) return null;
 
   let sqlString = '(';
-  for (const game of user.games) {
-    sqlString += `'${game}', `
+  if (user.games.length > 0) {
+    for (const game of user.games) {
+      sqlString += `'${game}', `
+    }
+    sqlString = sqlString.substring(0, sqlString.length - 2);
   }
-  sqlString = sqlString.substring(0, sqlString.length - 2);
   sqlString += ')';
   console.log(sqlString)
 
