@@ -11,9 +11,10 @@ async function getAllGames(user) {
       sqlString += `'${game}', `
     }
     sqlString = sqlString.substring(0, sqlString.length - 2);
+  } else {
+    sqlString += '0'
   }
   sqlString += ')';
-  console.log(sqlString)
 
   let data = JSON.stringify({
     operation: 'sql',

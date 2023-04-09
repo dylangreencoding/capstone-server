@@ -236,12 +236,10 @@ router.get('/protected', protected, async (request, response) => {
     // if user in request, send data
     if (request.user) {
 
-      // take a look at request.user
-      console.log(request.user[0].id);
-
       const maps = await getAllMaps(request.user[0].id);
       const chars = await getAllChars(request.user[0].id);
       const games = await getAllGames(request.user[0]);
+      console.log(games)
 
       return response.json({
         message: 'capstone-server-auth/protected: "You are logged in"',
@@ -272,14 +270,11 @@ router.get('/protected', protected, async (request, response) => {
 router.post('/save-map', protected, async (request, response) => {
   try {
     if (request.user) {
-      console.log('request', request.user)
 
       if (request.body.id === '') {
-        console.log('no map id, adding map')
         await createMap(request.body);
 
       } else {
-        console.log('map id, updating map')
         await updateMap(request.body);
       }
 
@@ -306,10 +301,8 @@ router.post('/save-map', protected, async (request, response) => {
 // deletes map
 router.post('/delete-map', protected, async (request, response) => {
   try {
-    console.log('REQUEST', request.user)
     if (request.user) {
 
-      console.log('DELETING MAP')
       await deleteMap(request.body);
 
       return response.json({
@@ -336,14 +329,11 @@ router.post('/delete-map', protected, async (request, response) => {
 router.post('/save-char', protected, async (request, response) => {
   try {
     if (request.user) {
-      console.log('request', request.user)
 
       if (request.body.id === '') {
-        console.log('no char id, adding char')
         await createChar(request.body);
 
       } else {
-        console.log('char id found, updating char')
         await updateChar(request.body);
       }
 
@@ -370,10 +360,8 @@ router.post('/save-char', protected, async (request, response) => {
 // deletes characters
 router.post('/delete-char', protected, async (request, response) => {
   try {
-    console.log('REQUEST', request.user)
     if (request.user) {
 
-      console.log('DELETING CHARACTER')
       await deleteChar(request.body);
 
       return response.json({
@@ -400,23 +388,21 @@ router.post('/delete-char', protected, async (request, response) => {
 router.post('/save-game', protected, async (request, response) => {
   try {
     if (request.user) {
-      console.log('request', request.user)
-
+      let gameId
+      let game;
       if (request.body.id === '') {
-        console.log('no game id, adding game')
-        const game = await createGame(request.body);
-
-        await addGameToUser(request.user[0], game.inserted_hashes[0]);
+        gameId = await createGame(request.body);
+        await addGameToUser(request.user[0], gameId.inserted_hashes[0]);
+        game = await findGame(gameId.inserted_hashes[0]);
 
       } else {
-        console.log('game id found, updating game');
-        await updateGame(request.body);
+        gameId = await updateGame(request.body);
+        game = await findGame(gameId.update_hashes[0]);
       }
-
       return response.json({
         message: 'capstone-server-auth/save-game: "Game saved successfully"',
         type: 'success',
-        game: request.body
+        game: game[0],
       })
     }
     // if user not in request, return error
@@ -437,9 +423,7 @@ router.post('/save-game', protected, async (request, response) => {
 router.post('/delete-game', protected, async (request, response) => {
   try {
 
-    if (request.user) {
-     
-      
+    if (request.user) { 
       const game = request.body;
       const userId = request.user[0].id;
       if (game.players[userId] === 'host' && Object.keys(game.players).length === 1) {
@@ -474,7 +458,7 @@ router.post('/delete-game', protected, async (request, response) => {
 // join game
 router.post('/join-game', protected, async (request, response) => {
   try {
-    console.log('REQUEST', request.user)
+
     if (request.user) {
 
       let game = await findGame(request.body.id);

@@ -43,7 +43,7 @@ async function updateGame(game) {
 
   try {
     const response = await axios(config);
-    console.log(response.data)
+    return response.data
   } catch (error) {
     console.log(error);
   }

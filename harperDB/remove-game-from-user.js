@@ -8,16 +8,6 @@ async function removeGameFromUser(user, game) {
     return game != gameId;
   });
 
-  // const gameId = game.id
-  // let games = []
-  // for (const game of user.games) {
-  //   if (game !== gameId) {
-  //     games.push(game);
-  //   }
-  // }
-
-  console.log(games)
-
   const dbUrl = process.env.HARPERDB_URL;
   const dbPw = process.env.HARPERDB_PW;
   if (!dbUrl || !dbPw) return null;
