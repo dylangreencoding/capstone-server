@@ -238,9 +238,7 @@ router.get('/protected', protected, async (request, response) => {
 
       const maps = await getAllMaps(request.user[0].id);
       const chars = await getAllChars(request.user[0].id);
-      console.log('passed to getAllGames>>>', request.user[0]);
       const games = await getAllGames(request.user[0]);
-      console.log('returned from getAllGames>>> ', games);
 
       return response.json({
         message: 'capstone-server-auth/protected: "You are logged in"',
@@ -475,7 +473,12 @@ router.post('/join-game', protected, async (request, response) => {
 
       if (game.length === 1 && !user.games.includes(request.body.id)) {
         await addGameToUser(request.user[0], request.body.id);
+        // add player to game as guest
         game[0].players[user.id] = 'guest';
+        // HERE: add player character to game.selectFrom
+        game[0].selectFrom['0 0'] = request.body.character;
+        console.log('--------', request.body.character);
+        console.log('update selectfrom', game[0]);
         await joinGame(game[0]);
         game = await findGame(request.body.id);
 

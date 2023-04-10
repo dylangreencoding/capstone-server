@@ -15,6 +15,7 @@ async function joinGame(game) {
       {
         'id': game.id,
         'players': game.players,
+        'selectFrom': game.selectFrom,
       }
     ]
   });
