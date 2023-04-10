@@ -238,8 +238,9 @@ router.get('/protected', protected, async (request, response) => {
 
       const maps = await getAllMaps(request.user[0].id);
       const chars = await getAllChars(request.user[0].id);
+      console.log('passed to getAllGames>>>', request.user[0]);
       const games = await getAllGames(request.user[0]);
-      console.log(games)
+      console.log('returned from getAllGames>>> ', games);
 
       return response.json({
         message: 'capstone-server-auth/protected: "You are logged in"',
@@ -422,16 +423,24 @@ router.post('/save-game', protected, async (request, response) => {
 // deletes game
 router.post('/delete-game', protected, async (request, response) => {
   try {
-
+    console.log('/delete-game')
     if (request.user) { 
+      console.log('user authorized')
       const game = request.body;
       const userId = request.user[0].id;
       if (game.players[userId] === 'host' && Object.keys(game.players).length === 1) {
+        console.log('host delete game')
         await removeUserFromGame(request.user[0], request.body);
         await removeGameFromUser(request.user[0], request.body);
         await deleteGame(request.body);
+      } else if (game.players[userId] === 'host' && Object.keys(game.players).length > 1) {
+        console.log('host trying to delete game, still users in game')
       } else if (game.players[userId] === 'guest') {
+        console.log('guest leave game')
         await removeUserFromGame(request.user[0], request.body);
+        await removeGameFromUser(request.user[0], request.body);
+      } else {
+        'guest leave game again'
         await removeGameFromUser(request.user[0], request.body);
       }
 

@@ -16,9 +16,10 @@ async function getAllGames(user) {
   }
   sqlString += ')';
 
+  console.log('SQL', sqlString);
+
   let data = JSON.stringify({
     operation: 'sql',
-    // sql: `SELECT * FROM users.games WHERE maker = '${user.id}'`,
     sql: `SELECT * FROM users.games WHERE id IN ${sqlString}`,
   });
 
