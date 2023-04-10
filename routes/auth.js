@@ -476,12 +476,11 @@ router.post('/join-game', protected, async (request, response) => {
         // add player to game as guest
         game[0].players[user.id] = 'guest';
         // HERE: add player character to game.selectFrom
-        game[0].selectFrom['0 0'] = request.body.character;
-        console.log('--------', request.body.character);
-        console.log('update selectfrom', game[0]);
+        game[0].selectFrom[user.id] = request.body.character;
+        // console.log(game[0].selectFrom);
         await joinGame(game[0]);
         game = await findGame(request.body.id);
-
+        console.log('GAME', game)
 
         return response.json({
           message: 'capstone-server-auth/join-game: "Game joined successfully"',
