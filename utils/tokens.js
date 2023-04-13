@@ -28,6 +28,8 @@ const sendAccessToken = (request, response, accessToken) => {
 const sendRefreshToken = (response, refreshToken) => {
   response.cookie('refresh_token', refreshToken, {
     httpOnly: true,
+    secure: true,
+    sameSite: 'none', 
   });
 };
 

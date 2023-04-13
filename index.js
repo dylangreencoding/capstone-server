@@ -29,7 +29,13 @@ app.use(express.urlencoded({ extended: false }));
 // parse cookies
 app.use(cookieParser());
 // allow cross-origin requests
-app.use(cors());
+app.use(cors({
+  origin: 'http://127.0.0.1:5173',
+  credentials: true,
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Access-Control-Allow-Origin'],
+  exposedHeaders: ['*', 'Authorization' ] 
+}));
 // add routes \\
 app.use('/', indexRouter);
 app.use('/auth', authRouter);

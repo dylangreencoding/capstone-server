@@ -127,9 +127,11 @@ router.post('/login', async (request, response) => {
     await addRefresh(user[0].id, refreshToken);
 
     // send response
+    // response.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1:5173');
+    // response.setHeader('Access-Control-Allow-Methods', 'POST')
     sendRefreshToken(response, refreshToken);
     sendAccessToken(request, response, accessToken);
-
+    console.log(response)
   } catch (error) {
     response.status(500).json({
       type: 'error',
@@ -141,7 +143,13 @@ router.post('/login', async (request, response) => {
 
 router.post('/logout', (request, response) => {
   // clear cookie...
-  response.clearCookie('refresh_token');
+  response.clearCookie('refresh_token', {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none', 
+  });
+  
+  console.log('logout', response)
   return response.json({
     message: 'capstone-server-auth/logout: "Logged out successfully"',
     type: 'success',
@@ -151,10 +159,11 @@ router.post('/logout', (request, response) => {
 // get new access token using refresh token
 router.post('/refresh_token', async (request, response) => {
   try {
-    const { refreshToken } = request.cookies;
-    console.log('refresh_token', refreshToken);
+    const { refresh_token } = request.cookies;
+    console.log(request);
+    console.log('refresh_token', refresh_token);
     // if no refresh token, return error
-    if (!refreshToken) {
+    if (!refresh_token) {
       return response.status(500).json({
         message: 'capstone-server-auth/refresh_token: "No refresh token"',
         type: 'error',
@@ -164,7 +173,7 @@ router.post('/refresh_token', async (request, response) => {
     // if refresh token, verify
     let id;
     try {
-      id = verify(refreshToken, process.env.REFRESH_TOKEN_SECRET).id;
+      id = verify(refresh_token, process.env.REFRESH_TOKEN_SECRET).id;
       console.log(id);
     } catch (error) {
       return response.status(500).json({
@@ -195,7 +204,7 @@ router.post('/refresh_token', async (request, response) => {
 
     // if user exists, check if refresh token is correct
     // if incorrect, return error
-    if (user[0].refresh_token !== refreshToken) {
+    if (user[0].refresh_token !== refresh_token) {
       return response.status(500).json({
         message: 'capstone-server-auth/refresh_token: "Invalid refresh token"',
         type: 'error',
@@ -328,6 +337,7 @@ router.post('/delete-map', protected, async (request, response) => {
 router.post('/save-char', protected, async (request, response) => {
   try {
     if (request.user) {
+      console.log('COOOKIE', request.cookies)
 
       if (request.body.id === '') {
         await createChar(request.body);
