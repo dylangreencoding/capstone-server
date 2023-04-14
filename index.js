@@ -50,6 +50,17 @@ const io = new Server(server, {
   },
 });
 
+// auth middleware for socket connection
+const { authorizeSocket } = require('./utils/authorize-socket');
+io.use((socket, next) => {
+  authHeader = socket.handshake.headers.authorization;
+  if (authHeader && authorizeSocket(authHeader)) {
+    return next();
+  }
+  return next(new Error('socket connection authorization failed'));
+})
+
+
 // listen for when client connects via socket.io-client
 io.on('connection', (socket) => {
   console.log(`SOCKET connection, socketID ${socket.id}`);
