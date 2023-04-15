@@ -35,7 +35,7 @@ async function removeUserFromGame(user, game) {
 
   try {
     const response = await axios(config);
-    console.log(response.data)
+    return response.data
   } catch (error) {
     console.log(error);
   }

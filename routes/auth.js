@@ -43,6 +43,7 @@ const {
   sendAccessToken,
   sendRefreshToken,
 } = require('../utils/tokens');
+const findById = require('../harperDB/find-user');
 
 // basic route
 // for demonstration and clarity
@@ -436,6 +437,8 @@ router.post('/delete-game', protected, async (request, response) => {
       console.log('user authorized')
       const game = request.body;
       const userId = request.user[0].id;
+      console.log('game', game)
+      console.log('userId', userId)
       if (game.players[userId] === 'host' && Object.keys(game.players).length === 1) {
         console.log('host delete game')
         await removeUserFromGame(request.user[0], request.body);
@@ -448,7 +451,7 @@ router.post('/delete-game', protected, async (request, response) => {
         await removeUserFromGame(request.user[0], request.body);
         await removeGameFromUser(request.user[0], request.body);
       } else {
-        'guest leave game again'
+        console.log('guest leave game again')
         await removeGameFromUser(request.user[0], request.body);
       }
 
@@ -514,6 +517,39 @@ router.post('/join-game', protected, async (request, response) => {
     response.status(500).json({
       type: 'error',
       message: 'capstone-server-auth/join-game: "Error getting protected route"',
+      error,
+    });
+  }
+})
+
+// remove-player from game
+router.post('/remove-player', protected, async (request, response) => {
+  try {
+    console.log('/remove-player')
+    if (request.user) { 
+      console.log('user authorized')
+      const { game, playerId } = request.body;
+      const user = await findById(playerId)
+
+      await removeGameFromUser(user[0], game);
+      const gameUpdate = await removeUserFromGame(user[0], game);
+      const updatedGame = await findGame(gameUpdate.update_hashes[0]);
+
+      return response.json({
+        message: 'capstone-server-auth/remove-player: "Player removed successfully"',
+        type: 'success',
+        game: updatedGame[0],
+      })
+    }
+    // if user not in request, return error
+    return response.status(500).json({
+      message: 'capstone-server-auth/remove-player: "You are not logged in"',
+      type: 'error',
+    });
+  } catch (error) {
+    response.status(500).json({
+      type: 'error',
+      message: 'capstone-server-auth/remove-player: "Error getting protected route"',
       error,
     });
   }
