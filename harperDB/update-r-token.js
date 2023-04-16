@@ -1,7 +1,8 @@
 const axios = require('axios');
 
 async function addRefresh(id, refresh_token) {
-  console.log('trying to add refresh token')
+  console.log('trying to add refresh token', id, refresh_token)
+
 
   const dbUrl = process.env.HARPERDB_URL;
   const dbPw = process.env.HARPERDB_PW;
@@ -31,7 +32,7 @@ async function addRefresh(id, refresh_token) {
 
   try {
     const response = await axios(config);
-    console.log(response.data)
+    return response.data
   } catch (error) {
     console.log(error);
   }

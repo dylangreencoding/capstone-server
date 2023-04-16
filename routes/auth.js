@@ -99,7 +99,6 @@ router.post('/login', async (request, response) => {
 
     // find user
     const user = await searchUsers(email);
-    console.log(user);
 
     // if user doesn't exist, return error
     if (user.length === 0) {
@@ -132,7 +131,7 @@ router.post('/login', async (request, response) => {
     // response.setHeader('Access-Control-Allow-Methods', 'POST')
     sendRefreshToken(response, refreshToken);
     sendAccessToken(request, response, accessToken);
-    console.log(response)
+
   } catch (error) {
     response.status(500).json({
       type: 'error',
@@ -150,7 +149,6 @@ router.post('/logout', (request, response) => {
     sameSite: 'none', 
   });
   
-  console.log('logout', response)
   return response.json({
     message: 'capstone-server-auth/logout: "Logged out successfully"',
     type: 'success',
@@ -161,7 +159,6 @@ router.post('/logout', (request, response) => {
 router.post('/refresh_token', async (request, response) => {
   try {
     const { refresh_token } = request.cookies;
-    console.log(request);
     console.log('refresh_token', refresh_token);
     // if no refresh token, return error
     if (!refresh_token) {
@@ -176,6 +173,7 @@ router.post('/refresh_token', async (request, response) => {
     try {
       id = verify(refresh_token, process.env.REFRESH_TOKEN_SECRET).id;
       console.log(id);
+      // HERE
     } catch (error) {
       return response.status(500).json({
         message: 'capstone-server-auth/refresh_token: "Invalid refresh token"',
@@ -193,10 +191,11 @@ router.post('/refresh_token', async (request, response) => {
 
     // if refresh token valid, find user
     const user = await findUser(id);
-    console.log(user);
+    console.log('REFRESH USER', user)
 
     // if user does not exist, return error
     if (user.length === 0) {
+      console.log('------user not found')
       return response.status(500).json({
         message: 'capstone-server-auth/refresh_token: "User not found"',
         type: 'error',
@@ -206,6 +205,7 @@ router.post('/refresh_token', async (request, response) => {
     // if user exists, check if refresh token is correct
     // if incorrect, return error
     if (user[0].refresh_token !== refresh_token) {
+      console.log('-------invalid refresh token', user)
       return response.status(500).json({
         message: 'capstone-server-auth/refresh_token: "Invalid refresh token"',
         type: 'error',
@@ -242,6 +242,7 @@ router.post('/refresh_token', async (request, response) => {
 // main protected route
 // returns user data
 router.get('/protected', protected, async (request, response) => {
+  
   try {
     // if user in request, send data
     if (request.user) {
@@ -265,6 +266,8 @@ router.get('/protected', protected, async (request, response) => {
       message: 'capstone-server-auth/protected: "You are not logged in"',
       type: 'error',
     });
+
+
   } catch (error) {
     response.status(500).json({
       type: 'error',
@@ -434,11 +437,9 @@ router.post('/delete-game', protected, async (request, response) => {
   try {
     console.log('/delete-game')
     if (request.user) { 
-      console.log('user authorized')
       const game = request.body;
       const userId = request.user[0].id;
-      console.log('game', game)
-      console.log('userId', userId)
+
       if (game.players[userId] === 'host' && Object.keys(game.players).length === 1) {
         console.log('host delete game')
         await removeUserFromGame(request.user[0], request.body);
@@ -447,7 +448,7 @@ router.post('/delete-game', protected, async (request, response) => {
       } else if (game.players[userId] === 'host' && Object.keys(game.players).length > 1) {
         console.log('host trying to delete game, still users in game')
       } else if (game.players[userId] === 'guest') {
-        console.log('guest leave game')
+
         await removeUserFromGame(request.user[0], request.body);
         await removeGameFromUser(request.user[0], request.body);
       } else {
@@ -455,10 +456,12 @@ router.post('/delete-game', protected, async (request, response) => {
         await removeGameFromUser(request.user[0], request.body);
       }
 
+      const updatedGame = await findGame(game.id);
+
       return response.json({
         message: 'capstone-server-auth/delete-game: "Game deleted successfully"',
         type: 'success',
-        game: request.body,
+        game: updatedGame,
       })
     }
     // if user not in request, return error
@@ -530,10 +533,14 @@ router.post('/remove-player', protected, async (request, response) => {
       console.log('user authorized')
       const { game, playerId } = request.body;
       const user = await findById(playerId)
+      const playerRemoved = await removeGameFromUser(user[0], game);
 
-      await removeGameFromUser(user[0], game);
-      const gameUpdate = await removeUserFromGame(user[0], game);
-      const updatedGame = await findGame(gameUpdate.update_hashes[0]);
+      // ensures player is not removed from game until game is removed from player
+      let updatedGame;
+      if (playerRemoved.update_hashes[0] = playerId) {
+        const gameUpdate = await removeUserFromGame(user[0], game);
+        updatedGame = await findGame(gameUpdate.update_hashes[0]);
+      }
 
       return response.json({
         message: 'capstone-server-auth/remove-player: "Player removed successfully"',

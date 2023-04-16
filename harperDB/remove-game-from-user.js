@@ -7,7 +7,7 @@ async function removeGameFromUser(user, game) {
   const games = user.games.filter((game) => {
     return game !== gameId;
   });
-  console.log('GAMES', games)
+
   const dbUrl = process.env.HARPERDB_URL;
   const dbPw = process.env.HARPERDB_PW;
   if (!dbUrl || !dbPw) return null;
@@ -36,7 +36,7 @@ async function removeGameFromUser(user, game) {
 
   try {
     const response = await axios(config);
-    console.log(response.data)
+    return response.data
   } catch (error) {
     console.log(error);
   }

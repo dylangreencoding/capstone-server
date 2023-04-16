@@ -1,6 +1,20 @@
 // access environment variables
 require('dotenv').config();
 
+// hell yes!!!
+['log', 'warn'].forEach(function(method) {
+  var old = console[method];
+  console[method] = function() {
+    var stack = (new Error()).stack.split(/\n/);
+    // Chrome includes a single "Error" line, FF doesn't.
+    if (stack[0].indexOf('Error') === 0) {
+      stack = stack.slice(1);
+    }
+    var args = [].slice.apply(arguments).concat([stack[1].trim()]);
+    return old.apply(console, args);
+  };
+});
+
 // import dependencies
 const express = require('express');
 const cookieParser = require('cookie-parser');
@@ -96,19 +110,17 @@ io.on('connection', (socket) => {
   });
 
   socket.on('send_game', (data) => {
-    console.log(data);
-    const {gameroomId, game} = data;
-
-    socket.to(gameroomId).emit('receive_game', { 
-      message: `WTF???`,
-      game,
-    });
-  })
+    const { game } = data;
+    if (game) {
+      socket.to(game.id).emit('receive_game', { 
+        message: `socket on send_game, emit receive_game`,
+        game,
+      });
+    }
+  });
 
   socket.on('disconnect', () => {
     console.log('SOCKET disconnect')
-    // const { gameroomId, userEmail } = data;
-
     // socket.to(gameroomId).emit('socket_message', { 
     //   message: `player ${userEmail} disconnected from ${gameroomId}`,
     // });

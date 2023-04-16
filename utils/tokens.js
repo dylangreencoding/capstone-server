@@ -2,11 +2,11 @@ const { sign } = require('jsonwebtoken');
 
 // sign access token
 // time in seconds
-// 40 * 60 seconds = 40 minutes
+// 60 seconds * 60 minutes = 1hr
 const createAccessToken = (id) => {
   return sign({ id }, process.env.ACCESS_TOKEN_SECRET, {
-    // 
-    expiresIn: 40 * 60,
+    expiresIn: 60 * 60,
+    // expiresIn: 60 * 1,
   });
 };
 
