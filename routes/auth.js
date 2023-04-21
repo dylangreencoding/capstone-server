@@ -482,11 +482,14 @@ router.post('/delete-game', protected, async (request, response) => {
 router.post('/join-game', protected, async (request, response) => {
   try {
 
+    // if authenticated by /protected route
     if (request.user) {
 
+      // look for game with provided id
       let game = await findGame(request.body.id);
       const user = request.user[0];
 
+      // if game exists and you aren't already in it
       if (game.length === 1 && !user.games.includes(request.body.id)) {
         await addGameToUser(request.user[0], request.body.id);
         // add player to game as guest
@@ -531,6 +534,7 @@ router.post('/remove-player', protected, async (request, response) => {
     console.log('/remove-player')
     if (request.user) { 
       console.log('user authorized')
+      console.log(request.body)
       const { game, playerId } = request.body;
       const user = await findById(playerId)
       const playerRemoved = await removeGameFromUser(user[0], game);

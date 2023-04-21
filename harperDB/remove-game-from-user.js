@@ -2,6 +2,7 @@ const axios = require('axios');
 
 async function removeGameFromUser(user, game) {
   console.log('trying to remove game from user')
+  console.log(game)
   
   const gameId = game.id
   const games = user.games.filter((game) => {

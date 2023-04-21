@@ -29,7 +29,7 @@ const authRouter = require('./routes/auth');
 const blogRouter = require('./routes/blog')
 
 // server port
-const port = process.env.PORT;
+const port = process.env.PORT || 8080;
 
 // create express app \\
 const app = express();

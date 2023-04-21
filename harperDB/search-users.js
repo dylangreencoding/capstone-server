@@ -10,6 +10,7 @@ async function searchUsers (email) {
   const dbUrl = process.env.HARPERDB_URL;
   const dbPw = process.env.HARPERDB_PW;
   if (!dbUrl || !dbPw) return null;
+  console.log(email, dbUrl, dbPw);
 
   const search_value = email;
 
@@ -37,7 +38,7 @@ async function searchUsers (email) {
     const response = await axios(config);
     return response.data;
   } catch (error) {
-    console.log(error);
+    console.log('WTF???');
   }
 
 }
