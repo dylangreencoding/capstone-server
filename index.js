@@ -1,6 +1,6 @@
 // access environment variables
 require('dotenv').config();
-const clientUrl = 'https://capstone-tabletop.herokuapp.com/';
+const clientUrl = 'https://capstone-tabletop.herokuapp.com';
 // const clientUrl = 'http://127.0.0.1:5173';
 // hell yes!!!
 ['log', 'warn'].forEach(function(method) {
