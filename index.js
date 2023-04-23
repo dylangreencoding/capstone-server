@@ -1,6 +1,7 @@
 // access environment variables
 require('dotenv').config();
-
+const clientUrl = 'https://capstone-tabletop.herokuapp.com/';
+// const clientUrl = 'http://127.0.0.1:5173';
 // hell yes!!!
 ['log', 'warn'].forEach(function(method) {
   var old = console[method];
@@ -44,7 +45,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 // allow cross-origin requests
 app.use(cors({
-  origin: 'http://127.0.0.1:5173',
+  origin: clientUrl,
   credentials: true,
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Access-Control-Allow-Origin'],
@@ -59,7 +60,7 @@ app.use('/blog', blogRouter);
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: 'http://127.0.0.1:5173',
+    origin: clientUrl,
     methods: ['GET', 'POST'],
   },
 });
