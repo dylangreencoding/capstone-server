@@ -26,10 +26,10 @@ const { Server } = require ('socket.io');
 // import routes
 const indexRouter = require('./routes/index');
 const authRouter = require('./routes/auth');
-const blogRouter = require('./routes/blog')
+const blogRouter = require('./routes/blog');
 
 // server port
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 80;
 
 // create express app \\
 const app = express();
