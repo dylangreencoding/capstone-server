@@ -13,7 +13,7 @@ async function createGame(game) {
 
   const data = JSON.stringify({
     'operation': 'insert',
-    'schema': 'users',
+    'schema': 'games',
     'table': 'games',
     'records': [
       game

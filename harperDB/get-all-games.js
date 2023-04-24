@@ -18,7 +18,7 @@ async function getAllGames(user) {
 
   let data = JSON.stringify({
     operation: 'sql',
-    sql: `SELECT * FROM users.games WHERE id IN ${sqlString}`,
+    sql: `SELECT * FROM games.games WHERE id IN ${sqlString}`,
   });
 
   let config = {

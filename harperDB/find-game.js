@@ -15,7 +15,7 @@ async function findGame (id) {
 
   const data = JSON.stringify({
     'operation' : 'search_by_hash',
-    'schema' : 'users',
+    'schema' : 'games',
     'table' : 'games',
     hash_values,
     'get_attributes' : [

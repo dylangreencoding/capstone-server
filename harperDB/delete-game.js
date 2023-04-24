@@ -9,7 +9,7 @@ async function deleteGame(game) {
 
   const data = JSON.stringify({
     'operation': 'delete',
-    'schema': 'users',
+    'schema': 'games',
     'table': 'games',
     'hash_values': [
         game.id,

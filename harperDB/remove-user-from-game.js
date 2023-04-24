@@ -13,7 +13,7 @@ async function removeUserFromGame(user, game) {
 
   const data = JSON.stringify({
     'operation': 'update',
-    'schema': 'users',
+    'schema': 'games',
     'table': 'games',
     'records': [
       {
