@@ -1,7 +1,11 @@
 // access environment variables
 require('dotenv').config();
+
+
 const clientUrl = 'https://capstone-tabletop.herokuapp.com';
 // const clientUrl = 'http://127.0.0.1:5173';
+
+
 // hell yes!!!
 ['log', 'warn'].forEach(function(method) {
   var old = console[method];
@@ -20,6 +24,7 @@ const clientUrl = 'https://capstone-tabletop.herokuapp.com';
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+
 // for socket server
 const http = require('http');
 const { Server } = require ('socket.io');
@@ -28,6 +33,9 @@ const { Server } = require ('socket.io');
 const indexRouter = require('./routes/index');
 const authRouter = require('./routes/auth');
 const blogRouter = require('./routes/blog');
+const mapRouter = require('./routes/map');
+const charRouter = require('./routes/char');
+const gameRouter = require('./routes/game');
 
 // server port
 const port = process.env.PORT || 80;
@@ -55,6 +63,9 @@ app.use(cors({
 app.use('/', indexRouter);
 app.use('/auth', authRouter);
 app.use('/blog', blogRouter);
+app.use('/map', mapRouter);
+app.use('/char', charRouter);
+app.use('/game', gameRouter);
 
 // socket server
 const server = http.createServer(app);

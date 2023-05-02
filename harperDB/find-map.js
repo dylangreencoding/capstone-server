@@ -1,7 +1,8 @@
 const axios = require('axios');
+// UNUSED 5/1/2023
 
-async function findGame (id) {
-  console.log('trying to find game')
+async function findMap (id) {
+  console.log('trying to find map')
 
   const dbUrl = process.env.HARPERDB_URL;
   const dbPw = process.env.HARPERDB_PW;
@@ -11,24 +12,12 @@ async function findGame (id) {
 
   const data = JSON.stringify({
     'operation' : 'search_by_hash',
-    'schema' : 'games',
-    'table' : 'games',
+    'schema' : 'user',
+    'table' : 'maps',
     hash_values,
     'get_attributes' : [
       'id',
       'maker',
-      'name',
-      'x',
-      'y',
-      'scale',
-      'selected',
-      'selectFrom',
-      'tool',
-      'width',
-      'height',
-      'lines',
-      'players',
-      'messages'
   ]
   });
 
@@ -52,4 +41,4 @@ async function findGame (id) {
 
 }
 
-module.exports = findGame;
+module.exports = findMap;
