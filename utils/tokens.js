@@ -9,6 +9,13 @@ const createAccessToken = (id) => {
   });
 };
 
+// sign email validation token
+const createValidationToken = (id) => {
+  return sign({ id }, process.env.VALIDATION_TOKEN_SECRET, {
+    expiresIn: 60 * 60,
+  });
+};
+
 // sign refresh token
 const createRefreshToken = (id) => {
   return sign({ id }, process.env.REFRESH_TOKEN_SECRET, {
@@ -27,6 +34,7 @@ const sendAccessToken = (request, response, accessToken) => {
 
 // send refresh token to client as cookie
 const sendRefreshToken = (response, refreshToken) => {
+  console.log('REFREHSTOKEN', refreshToken)
   response.cookie('refresh_token', refreshToken, {
     httpOnly: true,
     secure: true,
@@ -36,6 +44,7 @@ const sendRefreshToken = (response, refreshToken) => {
 
 module.exports = {
   createAccessToken,
+  createValidationToken,
   createRefreshToken,
   sendAccessToken,
   sendRefreshToken,

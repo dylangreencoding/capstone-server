@@ -4,7 +4,7 @@ const axios = require('axios');
 // nosql operations
 // insert
 // modified to use async/await syntax
-async function addUser(email, password) {
+async function addUser(name, birthYear, email, password, validationCode) {
   console.log('trying to add user')
 
   const dbUrl = process.env.HARPERDB_URL;
@@ -17,10 +17,13 @@ async function addUser(email, password) {
     'table': 'users',
     'records': [
       {
+        name,
+        birthYear,
         email,
         password,
         'refresh_token': '',
         games: [],
+        validationCode,
       }
     ],
   });

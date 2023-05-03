@@ -2,10 +2,6 @@
 require('dotenv').config();
 
 
-const clientUrl = 'https://capstone-tabletop.herokuapp.com';
-// const clientUrl = 'http://127.0.0.1:5173';
-
-
 // hell yes!!!
 ['log', 'warn'].forEach(function(method) {
   var old = console[method];
@@ -32,7 +28,6 @@ const { Server } = require ('socket.io');
 // import routes
 const indexRouter = require('./routes/index');
 const authRouter = require('./routes/auth');
-const blogRouter = require('./routes/blog');
 const mapRouter = require('./routes/map');
 const charRouter = require('./routes/char');
 const gameRouter = require('./routes/game');
@@ -53,7 +48,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 // allow cross-origin requests
 app.use(cors({
-  origin: clientUrl,
+  origin: process.env.CLIENT_URL,
   credentials: true,
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Access-Control-Allow-Origin'],
@@ -62,7 +57,6 @@ app.use(cors({
 // add routes \\
 app.use('/', indexRouter);
 app.use('/auth', authRouter);
-app.use('/blog', blogRouter);
 app.use('/map', mapRouter);
 app.use('/char', charRouter);
 app.use('/game', gameRouter);
@@ -71,7 +65,7 @@ app.use('/game', gameRouter);
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: clientUrl,
+    origin: process.env.CLIENT_URL,
     methods: ['GET', 'POST'],
   },
 });

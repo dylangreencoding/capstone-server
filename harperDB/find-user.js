@@ -18,10 +18,13 @@ async function findById (id) {
     'table' : 'users',
     hash_values,
     'get_attributes' : [
+      'name',
+      'birthYear',
       'email',
       'password',
       'id',
       'refresh_token',
+      'validationCode',
       'games'
     ]
   });
