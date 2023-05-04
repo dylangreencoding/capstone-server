@@ -12,7 +12,7 @@ const createAccessToken = (id) => {
 // sign email validation token
 const createValidationToken = (id) => {
   return sign({ id }, process.env.VALIDATION_TOKEN_SECRET, {
-    expiresIn: 60 * 60,
+    expiresIn: 60 * 15,
   });
 };
 

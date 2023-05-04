@@ -18,10 +18,10 @@ const validateEmailTemplate = (user, validationCode) => {
   return {
     from: `Mail - <${process.env.MAIL_USERNAME}>`,
     to: email,
-    subject: 'Validation Code',
+    subject: 'Verification Code',
     html: `
-    <h2>Validation Code</h2>
-    <p>Copy this code and paste in email validation field. This code expires in 1 hr.</p>
+    <h2>Verification Code</h2>
+    <p>Copy this code and paste in <strong>Verification Code</strong> field. This code expires after 15 minutes.</p>
     <br />
     <br />
     <small>${validationCode}</small>

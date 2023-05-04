@@ -17,6 +17,7 @@ const addUser = require('../harperDB/create-user');
 const findUser = require('../harperDB/find-user');
 const addRefresh = require('../harperDB/update-r-token');
 const updateValidationCode = require('../harperDB/update-validation-code')
+const updatePassword = require('../harperDB/update-password')
 
 const getAllMaps = require('../harperDB/get-all-maps');
 const getAllChars = require('../harperDB/get-all-chars');
@@ -63,10 +64,10 @@ router.post('/create-account', async (request, response) => {
 
     // if user doesn't exist, create new user
     // hash (encrypt) the pw
-    const passwordHash = await hash(password, 10);
-    
+    // const passwordHash = await hash(password, 10);
+    const unverifiedAccountPassword = '';
     // save user to db
-    await addUser(name, birthYear, email, passwordHash);
+    await addUser(name, birthYear, email, unverifiedAccountPassword);
     user = await searchUsers(email);
 
     // add validation code to user in db
@@ -108,6 +109,58 @@ router.post('/create-account', async (request, response) => {
 
 
 
+// resend validation email
+router.post('/resend-validation-email', async (request, response) => {
+  try {
+    const { email } = request.body;
+
+    // find user
+    const user = await searchUsers(email);
+    console.log('HERE', user)
+
+    // if user doesn't exist, return error
+    if (user.length === 0) {
+      return response.status(500).json({
+        message: 'capstone-server-auth/resend-validation-email: "User does not exist"',
+        type: 'error',
+      });
+    }
+
+    // add validation code to user in db
+    const validationCode = createValidationToken(user[0].id);
+    await updateValidationCode(user[0].id, validationCode);
+
+    //send validation code to user email
+    const mailOptions = validateEmailTemplate(user[0], validationCode);
+    transporter.sendMail(mailOptions, (err, info) => {
+      if (err) {
+        return res.status(500).json({
+          message: `Error sending email to ${user[0].email}`,
+          type: "error",
+        });
+      }
+      return res.json({
+        message: `Validation code has been sent to email ${user[0].email}`,
+        type: "success",
+      });
+    });
+
+    // send response
+    return response.status(200).json({
+      message: 'capstone-server-auth/resend-validation-email: "successful"',
+      type: 'success',
+    });
+
+  } catch (error) {
+    response.status(500).json({
+      type: 'error',
+      message: 'capstone-server-auth/resend-validation-email: "Error"',
+      error,
+    });
+  }
+});
+
+
 
 
 
@@ -116,7 +169,7 @@ router.post('/create-account', async (request, response) => {
 router.post('/validate-email', async (request, response) => {
   console.log('trying to validate email')
   try {
-    const { validationCode } = request.body;
+    const { validationCode, password } = request.body;
 
     // if no validation token, return error
     if (!validationCode) {
@@ -158,8 +211,16 @@ router.post('/validate-email', async (request, response) => {
       });
     }
 
+    // if user exists, update password
+    // hash (encrypt) the pw
+    const passwordHash = await hash(password, 10);
+    // save new password to db
+    await updatePassword(user[0].id, passwordHash);
+    console.log('HHHHHEEEEE')
+
     // validate
     await updateValidationCode(user[0].id, '');
+
     // send response
     return response.status(200).json({
       message: 'capstone-server-auth/validate-email: "Email validated successfully"',
@@ -205,12 +266,12 @@ router.post('/login', async (request, response) => {
     }
 
     // if account has not been validated, return error
-    if (user[0].validationCode !== '') {
-      return response.status(500).json({
-        message: 'capstone-server-auth/login: "User email has not been validated"',
-        type: 'error',
-      });
-    }
+    // if (user[0].validationCode !== '') {
+    //   return response.status(500).json({
+    //     message: 'capstone-server-auth/login: "User email has not been validated"',
+    //     type: 'error',
+    //   });
+    // }
 
     // if user exists, check if password is correct
     const passwordMatch = await compare(password, user[0].password);
