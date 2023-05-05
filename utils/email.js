@@ -15,20 +15,21 @@ const transporter = createTransport({
 
 const validateEmailTemplate = (user, validationCode) => {
   const email = user.email;
+  const copyId = () => {
+    navigator.clipboard.writeText(validationCode);
+  }
   return {
     from: `Mail - <${process.env.MAIL_USERNAME}>`,
     to: email,
     subject: 'Verification Code',
     html: `
     <h2>Verification Code</h2>
-    <p>Copy this code and paste in <strong>Verification Code</strong> field. This code expires after 15 minutes.</p>
-    <br />
-    <br />
+    <p>Copy and paste this code under <strong>Verification Code</strong>.</p>
+    <p>This code expires after 15 minutes.</p>
     <small>${validationCode}</small>
     <br />
-    <br />
     <p>Thanks,</p>
-    <p>capstone-tabletop-server</p>`,
+    <p>Capstone Creators</p>`,
   }
 }
 

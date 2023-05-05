@@ -4,8 +4,7 @@ const { sign } = require('jsonwebtoken');
 // time in seconds
 const createAccessToken = (id) => {
   return sign({ id }, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: 60 * 5,
-    // expiresIn: 5,
+    expiresIn: 60 * 20,
   });
 };
 
