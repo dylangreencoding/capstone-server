@@ -21,7 +21,7 @@ const findById = require('../harperDB/find-user');
 router.post('/save', protected, async (request, response) => {
   try {
     if (request.user) {
-      let gameId
+      let gameId;
       let game;
       if (request.body.id === '') {
         gameId = await createGame(request.body);
