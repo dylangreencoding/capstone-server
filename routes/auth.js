@@ -1,27 +1,27 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
 // for hashing and comparing passwords
-const { hash, compare } = require('bcryptjs');
+const { hash, compare } = require("bcryptjs");
 
 // for getting new access token using refresh token
-const { verify } = require('jsonwebtoken');
+const { verify } = require("jsonwebtoken");
 
 // middleware for protected route
-const { protected } = require('../utils/protected');
+const { protected } = require("../utils/protected");
 
 // harperDB
 // TODO: rename these better
-const searchUsers = require('../harperDB/search-users');
-const addUser = require('../harperDB/create-user');
-const findUser = require('../harperDB/find-user');
-const addRefresh = require('../harperDB/update-r-token');
-const updateValidationCode = require('../harperDB/update-validation-code')
-const updatePassword = require('../harperDB/update-password')
+const searchUsers = require("../harperDB/search-users");
+const addUser = require("../harperDB/create-user");
+const findUser = require("../harperDB/find-user");
+const addRefresh = require("../harperDB/update-r-token");
+const updateValidationCode = require("../harperDB/update-validation-code");
+const updatePassword = require("../harperDB/update-password");
 
-const getAllMaps = require('../harperDB/get-all-maps');
-const getAllChars = require('../harperDB/get-all-chars');
-const getAllGames = require('../harperDB/get-all-games');
+const getAllMaps = require("../harperDB/get-all-maps");
+const getAllChars = require("../harperDB/get-all-chars");
+const getAllGames = require("../harperDB/get-all-games");
 
 // tokens
 const {
@@ -30,42 +30,39 @@ const {
   sendAccessToken,
   sendRefreshToken,
   createValidationToken,
-} = require('../utils/tokens');
+} = require("../utils/tokens");
 
 // nodemailer
-const {
-  transporter,
-  validateEmailTemplate,
-} = require('../utils/email')
+const { transporter, validateEmailTemplate } = require("../utils/email");
 
 // basic route
 // for demonstration and clarity
-router.get('/', async (request, response) => {
+router.get("/", async (request, response) => {
   response.send(`/auth endpoint`);
 });
 
 // handle signup request
-router.post('/create-account', async (request, response) => {
-  console.log('trying to create account')
+router.post("/create-account", async (request, response) => {
+  console.log("trying to create account");
   try {
     // destructure client request
     const { name, birthYear, email, password } = request.body;
 
     // check if user exists
     let user = await searchUsers(email);
-    console.log(user)
+    console.log(user);
     // if user exists, return error
     if (user.length !== 0) {
       return response.status(500).json({
         message: `capstone-server-auth/create-account: "User account already exists, try logging in"`,
-        type: 'warning',
+        type: "warning",
       });
     }
 
     // if user doesn't exist, create new user
     // hash (encrypt) the pw
     // const passwordHash = await hash(password, 10);
-    const unverifiedAccountPassword = '';
+    const unverifiedAccountPassword = "";
     // save user to db
     await addUser(name, birthYear, email, unverifiedAccountPassword);
     user = await searchUsers(email);
@@ -91,38 +88,36 @@ router.post('/create-account', async (request, response) => {
 
     // send response
     return response.status(200).json({
-      message: 'capstone-server-auth/create-account: "User account created successfully"',
-      type: 'success',
+      message:
+        'capstone-server-auth/create-account: "User account created successfully"',
+      type: "success",
     });
   } catch (error) {
     response.status(500).json({
-      type: 'error',
-      message: 'capstone-server-auth/create-account: "Error creating user account"',
+      type: "error",
+      message:
+        'capstone-server-auth/create-account: "Error creating user account"',
       error,
-      data: request.body
+      data: request.body,
     });
   }
 });
 
-
-
-
-
-
 // resend validation email
-router.post('/resend-validation-email', async (request, response) => {
+router.post("/resend-validation-email", async (request, response) => {
   try {
     const { email } = request.body;
 
     // find user
     const user = await searchUsers(email);
-    console.log('HERE', user)
+    console.log("HERE", user);
 
     // if user doesn't exist, return error
     if (user.length === 0) {
       return response.status(500).json({
-        message: 'capstone-server-auth/resend-validation-email: "User does not exist"',
-        type: 'error',
+        message:
+          'capstone-server-auth/resend-validation-email: "User does not exist"',
+        type: "error",
       });
     }
 
@@ -132,6 +127,7 @@ router.post('/resend-validation-email', async (request, response) => {
 
     //send validation code to user email
     const mailOptions = validateEmailTemplate(user[0], validationCode);
+    console.log("AAAAAAAAA", mailOptions);
     transporter.sendMail(mailOptions, (err, info) => {
       if (err) {
         return res.status(500).json({
@@ -148,26 +144,20 @@ router.post('/resend-validation-email', async (request, response) => {
     // send response
     return response.status(200).json({
       message: 'capstone-server-auth/resend-validation-email: "successful"',
-      type: 'success',
+      type: "success",
     });
-
   } catch (error) {
     response.status(500).json({
-      type: 'error',
+      type: "error",
       message: 'capstone-server-auth/resend-validation-email: "Error"',
       error,
     });
   }
 });
 
-
-
-
-
-
 // handle email validation request
-router.post('/validate-email', async (request, response) => {
-  console.log('trying to validate email')
+router.post("/validate-email", async (request, response) => {
+  console.log("trying to validate email");
   try {
     const { validationCode, password } = request.body;
 
@@ -175,7 +165,7 @@ router.post('/validate-email', async (request, response) => {
     if (!validationCode) {
       return response.status(500).json({
         message: 'capstone-server-auth/validate-email: "No validation code"',
-        type: 'error',
+        type: "error",
       });
     }
 
@@ -187,16 +177,18 @@ router.post('/validate-email', async (request, response) => {
       // HERE
     } catch (error) {
       return response.status(500).json({
-        message: 'capstone-server-auth/validate-email: "Invalid email validation token"',
-        type: 'error',
+        message:
+          'capstone-server-auth/validate-email: "Invalid email validation token"',
+        type: "error",
       });
     }
 
     // if validation token invalid, return error
     if (!id) {
       return response.status(500).json({
-        message: 'capstone-server-auth/validate-email: "Invalid email validation token"',
-        type: 'error',
+        message:
+          'capstone-server-auth/validate-email: "Invalid email validation token"',
+        type: "error",
       });
     }
 
@@ -207,7 +199,7 @@ router.post('/validate-email', async (request, response) => {
     if (user.length === 0) {
       return response.status(500).json({
         message: 'capstone-server-auth/validate-email: "User does not exist"',
-        type: 'error',
+        type: "error",
       });
     }
 
@@ -216,41 +208,29 @@ router.post('/validate-email', async (request, response) => {
     const passwordHash = await hash(password, 10);
     // save new password to db
     await updatePassword(user[0].id, passwordHash);
-    console.log('HHHHHEEEEE')
+    console.log("HHHHHEEEEE");
 
     // validate
-    await updateValidationCode(user[0].id, '');
+    await updateValidationCode(user[0].id, "");
 
     // send response
     return response.status(200).json({
-      message: 'capstone-server-auth/validate-email: "Email validated successfully"',
-      type: 'success',
+      message:
+        'capstone-server-auth/validate-email: "Email validated successfully"',
+      type: "success",
     });
-
-
   } catch (error) {
     response.status(500).json({
-      type: 'error',
+      type: "error",
       message: 'capstone-server-auth/validate-email: "Error validating email"',
       error,
     });
   }
 });
 
-
-
-
-
-
-
-
-
-
-
-
 // handle signin request
-router.post('/login', async (request, response) => {
-  console.log('trying to log in')
+router.post("/login", async (request, response) => {
+  console.log("trying to log in");
   try {
     const { email, password } = request.body;
 
@@ -261,7 +241,7 @@ router.post('/login', async (request, response) => {
     if (user.length === 0) {
       return response.status(500).json({
         message: 'capstone-server-auth/login: "User does not exist"',
-        type: 'error',
+        type: "error",
       });
     }
 
@@ -280,7 +260,7 @@ router.post('/login', async (request, response) => {
     if (!passwordMatch) {
       return response.status(500).json({
         message: 'capstone-server-auth/login: "Password is incorrect"',
-        type: 'error',
+        type: "error",
       });
     }
 
@@ -294,55 +274,39 @@ router.post('/login', async (request, response) => {
     // send response
     sendRefreshToken(response, refreshToken);
     sendAccessToken(request, response, accessToken);
-
   } catch (error) {
     response.status(500).json({
-      type: 'error',
+      type: "error",
       message: 'capstone-server-auth/login: "Error logging in"',
       error,
     });
   }
 });
 
-
-
-
-
-
-
-
-router.post('/logout', (request, response) => {
+router.post("/logout", (request, response) => {
   // clear cookie...
-  response.clearCookie('refresh_token', {
+  response.clearCookie("refresh_token", {
     httpOnly: true,
     secure: true,
-    sameSite: 'none', 
+    sameSite: "none",
   });
-  
+
   return response.json({
     message: 'capstone-server-auth/logout: "Logged out successfully"',
-    type: 'success',
+    type: "success",
   });
 });
 
-
-
-
-
-
-
-
-
 // get new access token using refresh token
-router.post('/refresh_token', async (request, response) => {
+router.post("/refresh_token", async (request, response) => {
   try {
     const { refresh_token } = request.cookies;
-    console.log('refresh_token', refresh_token);
+    console.log("refresh_token", refresh_token);
     // if no refresh token, return error
     if (!refresh_token) {
       return response.status(500).json({
         message: 'capstone-server-auth/refresh_token: "No refresh token"',
-        type: 'error',
+        type: "error",
       });
     }
 
@@ -355,7 +319,7 @@ router.post('/refresh_token', async (request, response) => {
     } catch (error) {
       return response.status(500).json({
         message: 'capstone-server-auth/refresh_token: "Invalid refresh token"',
-        type: 'error',
+        type: "error",
       });
     }
 
@@ -363,30 +327,30 @@ router.post('/refresh_token', async (request, response) => {
     if (!id) {
       return response.status(500).json({
         message: 'capstone-server-auth/refresh_token: "Invalid refresh token"',
-        type: 'error',
+        type: "error",
       });
     }
 
     // if refresh token valid, find user
     const user = await findUser(id);
-    console.log('REFRESH USER', user)
+    console.log("REFRESH USER", user);
 
     // if user does not exist, return error
     if (user.length === 0) {
-      console.log('------user not found')
+      console.log("------user not found");
       return response.status(500).json({
         message: 'capstone-server-auth/refresh_token: "User not found"',
-        type: 'error',
+        type: "error",
       });
     }
 
     // if user exists, check if refresh token is correct
     // if incorrect, return error
     if (user[0].refresh_token !== refresh_token) {
-      console.log('-------invalid refresh token', user)
+      console.log("-------invalid refresh token", user);
       return response.status(500).json({
         message: 'capstone-server-auth/refresh_token: "Invalid refresh token"',
-        type: 'error',
+        type: "error",
       });
     }
 
@@ -404,42 +368,31 @@ router.post('/refresh_token', async (request, response) => {
     // only the message is different
     return response.json({
       message: 'capstone-server-auth/refresh_token: "Refreshed successfully"',
-      type: 'success',
+      type: "success",
       accessToken,
     });
-
   } catch (error) {
     response.status(500).json({
-      type: 'error',
+      type: "error",
       message: 'capstone-server-auth/refresh_token: "Error refreshing token"',
       error,
     });
   }
 });
 
-
-
-
-
-
-
-
-
 // main protected route
 // returns user data
-router.get('/protected', protected, async (request, response) => {
-  
+router.get("/protected", protected, async (request, response) => {
   try {
     // if user in request, send data
     if (request.user) {
-
       const maps = await getAllMaps(request.user[0].id);
       const chars = await getAllChars(request.user[0].id);
       const games = await getAllGames(request.user[0]);
 
       return response.json({
         message: 'capstone-server-auth/protected: "You are logged in"',
-        type: 'success',
+        type: "success",
         user: request.user,
         maps: maps,
         chars: chars,
@@ -450,19 +403,16 @@ router.get('/protected', protected, async (request, response) => {
     // if user not in request, return error
     return response.status(500).json({
       message: 'capstone-server-auth/protected: "You are not logged in"',
-      type: 'error',
+      type: "error",
     });
-
-
   } catch (error) {
     response.status(500).json({
-      type: 'error',
-      message: 'capstone-server-auth/protected: "Error getting protected route"',
+      type: "error",
+      message:
+        'capstone-server-auth/protected: "Error getting protected route"',
       error,
     });
   }
 });
-
-
 
 module.exports = router;
