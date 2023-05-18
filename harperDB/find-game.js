@@ -1,7 +1,7 @@
-const axios = require('axios');
+const axios = require("axios");
 
-async function findGame (id) {
-  console.log('trying to find game')
+async function findGame(id) {
+  console.log("trying to find game");
 
   const dbUrl = process.env.HARPERDB_URL;
   const dbPw = process.env.HARPERDB_PW;
@@ -10,38 +10,37 @@ async function findGame (id) {
   const hash_values = [id];
 
   const data = JSON.stringify({
-    'operation' : 'search_by_hash',
-    'schema' : 'games',
-    'table' : 'games',
+    operation: "search_by_hash",
+    schema: "games",
+    table: "games",
     hash_values,
-    'get_attributes' : [
-      'id',
-      'maker',
-      'name',
-      'x',
-      'y',
-      'scale',
-      'selected',
-      'selectFrom',
-      'tool',
-      'width',
-      'height',
-      'lines',
-      'players',
-      'messages'
-  ]
+    get_attributes: [
+      "id",
+      "maker",
+      "name",
+      "x",
+      "y",
+      "scale",
+      "selected",
+      "entities",
+      "tool",
+      "width",
+      "height",
+      "lines",
+      "players",
+      "messages",
+    ],
   });
 
   const config = {
-    method : 'post',
-    url : dbUrl,
-    headers : { 
-      'Content-Type' : 'application/json', 
-      Authorization : dbPw,
+    method: "post",
+    url: dbUrl,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: dbPw,
     },
-    data : data
+    data: data,
   };
-
 
   try {
     const response = await axios(config);
@@ -49,7 +48,6 @@ async function findGame (id) {
   } catch (error) {
     console.log(error);
   }
-
 }
 
 module.exports = findGame;

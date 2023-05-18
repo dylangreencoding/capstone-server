@@ -20,7 +20,7 @@ async function updateMap(map) {
         'y': map.y,
         'scale': map.scale,
         'selected': map.selected,
-        'selectFrom': map.selectFrom,
+        'entities': map.entities,
         'tool': map.tool,
         'width': map.width,
         'height': map.height,
