@@ -74,13 +74,17 @@ router.post("/create-account", async (request, response) => {
     //send validation code to user email
     const mailOptions = validateEmailTemplate(user[0], validationCode);
     transporter.sendMail(mailOptions, (err, info) => {
+      console.log(err, info);
       if (err) {
-        return res.status(500).json({
-          message: `Error sending email to ${user[0].email}`,
-          type: "error",
-        });
+        console.log("FIX THIS, EXPIRED TOKEN", err);
+        return null;
+        // RETURNING RESPONSE LIKE THIS HERE CRASHES SERVER
+        // return response.status(500).json({
+        //   message: `Error sending email to ${user[0].email}`,
+        //   type: "error",
+        // });
       }
-      return res.json({
+      return response.json({
         message: `Validation code has been sent to email ${user[0].email}`,
         type: "success",
       });
@@ -130,10 +134,13 @@ router.post("/resend-validation-email", async (request, response) => {
     console.log("AAAAAAAAA", mailOptions);
     transporter.sendMail(mailOptions, (err, info) => {
       if (err) {
-        return res.status(500).json({
-          message: `Error sending email to ${user[0].email}`,
-          type: "error",
-        });
+        console.log("FIX THIS, EXPIRED TOKEN", err);
+        return null;
+        // RETURNING RESPONSE LIKE THIS HERE CRASHES SERVER
+        // return response.status(500).json({
+        //   message: `Error sending email to ${user[0].email}`,
+        //   type: "error",
+        // });
       }
       return res.json({
         message: `Validation code has been sent to email ${user[0].email}`,
