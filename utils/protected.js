@@ -1,31 +1,31 @@
-const { verify } = require('jsonwebtoken');
-const cors = require('cors');
+const { verify } = require("jsonwebtoken");
+const cors = require("cors");
 //
-const findById = require('../harperDB/find-user');
+const { findById } = require("../harperDB/users-table");
 
 // middleware function to be called before request is processed
 const protected = async (request, response, next) => {
   // cors()
   // get token from request header
-  const authorization = request.headers['authorization'];
+  const authorization = request.headers["authorization"];
 
   // if no token, return error
   if (!authorization) {
     return response.status(500).json({
       message: 'capstone-server-protected-middleware: "No token"',
-      type: 'error',
+      type: "error",
     });
   }
 
   // if token, verify it
-  const token = authorization.split(' ')[1];
+  const token = authorization.split(" ")[1];
   let id;
   try {
     id = verify(token, process.env.ACCESS_TOKEN_SECRET).id;
   } catch {
     return response.status(500).json({
       message: 'capstone-server-protected-middleware: "Invalid token"',
-      type: 'error',
+      type: "error",
     });
   }
 
@@ -33,7 +33,7 @@ const protected = async (request, response, next) => {
   if (!id) {
     return response.status(500).json({
       message: 'capstone-server-protected-middleware: "Invalid token"',
-      type: 'error',
+      type: "error",
     });
   }
 
@@ -44,7 +44,7 @@ const protected = async (request, response, next) => {
   if (user.length === 0) {
     return response.status(500).json({
       message: 'capstone-server-protected-middleware: "User not found"',
-      type: 'error',
+      type: "error",
     });
   }
 
@@ -53,6 +53,6 @@ const protected = async (request, response, next) => {
 
   // call next middleware
   next();
-}
+};
 
 module.exports = { protected };

@@ -1,12 +1,11 @@
-const { verify } = require('jsonwebtoken');
+const { verify } = require("jsonwebtoken");
 //
-const findById = require('../harperDB/find-user');
+const { findById } = require("../harperDB/users-table");
 
 // middleware for socket authorization
 const authorizeSocket = async (authHeader) => {
-
   // get token from request auth header
-  const token = authHeader.split(' ')[1];
+  const token = authHeader.split(" ")[1];
 
   // verify token
   let id;
@@ -36,6 +35,6 @@ const authorizeSocket = async (authHeader) => {
   // ->
   // if user exists, return true
   return true;
-}
+};
 
 module.exports = { authorizeSocket };
