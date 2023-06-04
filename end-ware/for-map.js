@@ -11,21 +11,21 @@ const saveMap = async (request, response) => {
         await updateMap(request.body);
       }
 
-      return response.json({
-        message: 'capstone-server/map/save: "Map saved successfully"',
-        type: "success",
+      return response.status(200).json({
+        message: "Map saved successfully @ map/save",
+        type: "200 OK",
         map: request.body,
       });
     }
     // if user not in request, return error
     return response.status(500).json({
-      message: 'capstone-server/map/save: "You are not logged in"',
-      type: "error",
+      message: "You are not logged in @ map/save",
+      type: "500 Internal Server Error",
     });
   } catch (error) {
     response.status(500).json({
-      type: "error",
-      message: 'capstone-server/map/save: "Error getting protected route"',
+      type: "500 Internal Server Error",
+      message: "Error getting protected route @ map/save",
       error,
     });
   }
