@@ -41,9 +41,9 @@ const createAccount = async (request, response) => {
     console.log(user);
     // if user exists, return error
     if (user.length !== 0) {
-      return response.status(500).json({
-        message: `capstone-server-auth/create-account: "User account already exists, try logging in"`,
-        type: "warning",
+      return response.status(400).json({
+        message: `User email already on record @ auth/create-account"`,
+        type: "400 Bad Request",
       });
     }
 
@@ -61,34 +61,33 @@ const createAccount = async (request, response) => {
 
     //send validation code to user email
     const mailOptions = validateEmailTemplate(user[0], validationCode);
+    let mailSent = false;
     transporter.sendMail(mailOptions, (err, info) => {
-      console.log(err, info);
       if (err) {
-        console.log("FIX THIS, EXPIRED TOKEN", err);
-        return null;
-        // RETURNING RESPONSE LIKE THIS HERE CRASHES SERVER
-        // return response.status(500).json({
-        //   message: `Error sending email to ${user[0].email}`,
-        //   type: "error",
-        // });
+        // gmail api refresh token probably expired
+        // console.log(err);
+        return;
       }
-      return response.json({
-        message: `Validation code has been sent to email ${user[0].email}`,
-        type: "success",
-      });
+      mailSent = true;
+      return;
     });
 
     // send response
-    return response.status(200).json({
-      message:
-        'capstone-server-auth/create-account: "User account created successfully"',
-      type: "success",
-    });
+    if (mailSent === true) {
+      return response.status(200).json({
+        message: "User account created successfully @ auth/create-account",
+        type: "200 OK",
+      });
+    } else {
+      return response.status(502).json({
+        message: `User account created successfully @ auth/create-account \nFailed to send verification email @ auth/create-account`,
+        type: "502 Bad Gateway",
+      });
+    }
   } catch (error) {
     response.status(500).json({
-      type: "error",
-      message:
-        'capstone-server-auth/create-account: "Error creating user account"',
+      type: "500 Internal Server Error",
+      message: "Error creating user account @ auth/create-account",
       error,
       data: request.body,
     });
@@ -101,14 +100,12 @@ const resendValidationEmail = async (request, response) => {
 
     // find user
     const user = await searchUsers(email);
-    console.log("HERE", user);
 
-    // if user doesn't exist, return error
+    // if user not in db, return error
     if (user.length === 0) {
-      return response.status(500).json({
-        message:
-          'capstone-server-auth/resend-validation-email: "User does not exist"',
-        type: "error",
+      return response.status(404).json({
+        message: "User email not on record @ auth/resend-validation-email",
+        type: "404 Not Found",
       });
     }
 
@@ -118,47 +115,47 @@ const resendValidationEmail = async (request, response) => {
 
     //send validation code to user email
     const mailOptions = validateEmailTemplate(user[0], validationCode);
-    console.log("AAAAAAAAA", mailOptions);
+    let mailSent = false;
     transporter.sendMail(mailOptions, (err, info) => {
       if (err) {
-        console.log("FIX THIS, EXPIRED TOKEN", err);
-        return null;
-        // RETURNING RESPONSE LIKE THIS HERE CRASHES SERVER
-        // return response.status(500).json({
-        //   message: `Error sending email to ${user[0].email}`,
-        //   type: "error",
-        // });
+        // gmail api refresh token probably expired
+        // console.log(err);
+        return;
       }
-      return res.json({
-        message: `Validation code has been sent to email ${user[0].email}`,
-        type: "success",
-      });
+      mailSent = true;
+      return;
     });
 
     // send response
-    return response.status(200).json({
-      message: 'capstone-server-auth/resend-validation-email: "successful"',
-      type: "success",
-    });
+    if (mailSent === true) {
+      return response.status(200).json({
+        message: "Email sent successfully @ auth/resend-validation-email",
+        type: "200 OK",
+      });
+    } else {
+      return response.status(502).json({
+        message: "Failed to send email @ auth/resend-validation-email",
+        type: "502 Bad Gateway",
+      });
+    }
   } catch (error) {
     response.status(500).json({
-      type: "error",
-      message: 'capstone-server-auth/resend-validation-email: "Error"',
+      type: "500 Internal Server Error",
+      message: "Error @ auth/resend-validation-email",
       error,
     });
   }
 };
 
 const validateEmail = async (request, response) => {
-  console.log("trying to validate email");
   try {
     const { validationCode, password } = request.body;
 
     // if no validation token, return error
     if (!validationCode) {
-      return response.status(500).json({
-        message: 'capstone-server-auth/validate-email: "No validation code"',
-        type: "error",
+      return response.status(400).json({
+        message: "No verification code @ auth/validate-email",
+        type: "400 Bad Request",
       });
     }
 
@@ -166,33 +163,29 @@ const validateEmail = async (request, response) => {
     let id;
     try {
       id = verify(validationCode, process.env.VALIDATION_TOKEN_SECRET).id;
-      console.log(id);
-      console.log("WTF!!!!!!!!!!!!!!!!!");
       // HERE
     } catch (error) {
-      return response.status(500).json({
-        message:
-          'capstone-server-auth/validate-email: "Invalid email validation token"',
-        type: "error",
+      return response.status(400).json({
+        message: "Invalid verification code @ auth/validate-email",
+        type: "400 Bad Request",
       });
     }
     // if validation token invalid, return error
     if (!id) {
-      return response.status(500).json({
-        message:
-          'capstone-server-auth/validate-email: "Invalid email validation token"',
-        type: "error",
+      return response.status(400).json({
+        message: "Invalid verification code @ auth/validate-email",
+        type: "400 Bad Request",
       });
     }
 
     // if validation token valid, find user
     let user = await findById(id);
-    console.log(user);
+
     // if user doesn't exist, return error
     if (user.length === 0) {
-      return response.status(500).json({
-        message: 'capstone-server-auth/validate-email: "User does not exist"',
-        type: "error",
+      return response.status(404).json({
+        message: "User email not on record @ auth/validate-email",
+        type: "404 Not Found",
       });
     }
 
@@ -201,47 +194,44 @@ const validateEmail = async (request, response) => {
     const passwordHash = await hash(password, 10);
     // save new password to db
     await updatePassword(user[0].id, passwordHash);
-    console.log("HHHHHEEEEE");
 
     // validate
     await updateValidationCode(user[0].id, "");
 
     // send response
     return response.status(200).json({
-      message:
-        'capstone-server-auth/validate-email: "Email validated successfully"',
-      type: "success",
+      message: "Email verified successfully @ auth/validate-email",
+      type: "200 OK",
     });
   } catch (error) {
     response.status(500).json({
-      type: "error",
-      message: 'capstone-server-auth/validate-email: "Error validating email"',
+      type: "500 Internal Server Error",
+      message: "Error verifying email @ auth/validate-email",
       error,
     });
   }
 };
 
 const login = async (request, response) => {
-  console.log("trying to log in");
   try {
     const { email, password } = request.body;
 
     // find user
     const user = await searchUsers(email);
 
-    // if user doesn't exist, return error
+    // if user not in db, return error
     if (user.length === 0) {
-      return response.status(500).json({
-        message: 'capstone-server-auth/login: "User does not exist"',
-        type: "error",
+      return response.status(404).json({
+        message: "User email not on record @ auth/login",
+        type: "404 Not Found",
       });
     }
 
     // if account has not been validated, return error
     // if (user[0].validationCode !== '') {
-    //   return response.status(500).json({
-    //     message: 'capstone-server-auth/login: "User email has not been validated"',
-    //     type: 'error',
+    //   return response.status(401).json({
+    //     message: 'User email has not been verified @ auth/login',
+    //     type: '401 Unauthorized',
     //   });
     // }
 
@@ -250,9 +240,9 @@ const login = async (request, response) => {
 
     // if password incorrect, return error
     if (!passwordMatch) {
-      return response.status(500).json({
-        message: 'capstone-server-auth/login: "Password is incorrect"',
-        type: "error",
+      return response.status(401).json({
+        message: "Incorrect password @ auth/login",
+        type: "401 Unauthorized",
       });
     }
 
@@ -268,8 +258,8 @@ const login = async (request, response) => {
     sendAccessToken(request, response, accessToken);
   } catch (error) {
     response.status(500).json({
-      type: "error",
-      message: 'capstone-server-auth/login: "Error logging in"',
+      type: "500 Internal Server Error",
+      message: "Error logging in @ auth/login",
       error,
     });
   }
@@ -283,21 +273,21 @@ const logout = (request, response) => {
     sameSite: "none",
   });
 
-  return response.json({
-    message: 'capstone-server-auth/logout: "Logged out successfully"',
-    type: "success",
+  return response.status(200).json({
+    message: "Logged out successfully @ auth/logout",
+    type: "200 OK",
   });
 };
 
 const refreshTokens = async (request, response) => {
   try {
     const { refresh_token } = request.cookies;
-    console.log("refresh_token", refresh_token);
+
     // if no refresh token, return error
     if (!refresh_token) {
-      return response.status(500).json({
-        message: 'capstone-server-auth/refresh_token: "No refresh token"',
-        type: "error",
+      return response.status(401).json({
+        message: "No refresh token  @ auth/refresh_token",
+        type: "401 Unauthorized",
       });
     }
 
@@ -308,40 +298,37 @@ const refreshTokens = async (request, response) => {
       console.log(id);
       // HERE
     } catch (error) {
-      return response.status(500).json({
-        message: 'capstone-server-auth/refresh_token: "Invalid refresh token"',
-        type: "error",
+      return response.status(401).json({
+        message: "Invalid refresh token  @ auth/refresh_token",
+        type: "401 Unauthorized",
       });
     }
 
     // if refresh token invalid, return error
     if (!id) {
-      return response.status(500).json({
-        message: 'capstone-server-auth/refresh_token: "Invalid refresh token"',
-        type: "error",
+      return response.status(401).json({
+        message: "Invalid refresh token @ auth/refresh_token",
+        type: "401 Unauthorized",
       });
     }
 
     // if refresh token valid, find user
     const user = await findById(id);
-    console.log("REFRESH USER", user);
 
     // if user does not exist, return error
     if (user.length === 0) {
-      console.log("------user not found");
-      return response.status(500).json({
-        message: 'capstone-server-auth/refresh_token: "User not found"',
-        type: "error",
+      return response.status(404).json({
+        message: "User email not on record @ auth/refresh_token",
+        type: "404 Not Found",
       });
     }
 
-    // if user exists, check if refresh token is correct
+    // if user exists, check if refresh tokens match
     // if incorrect, return error
     if (user[0].refresh_token !== refresh_token) {
-      console.log("-------invalid refresh token", user);
-      return response.status(500).json({
-        message: 'capstone-server-auth/refresh_token: "Invalid refresh token"',
-        type: "error",
+      return response.status(401).json({
+        message: "Invalid refresh token @ auth/refresh_token",
+        type: "401 Unauthorized",
       });
     }
 
@@ -357,15 +344,15 @@ const refreshTokens = async (request, response) => {
 
     // this return is the same as the sendAccessToken function
     // only the message is different
-    return response.json({
-      message: 'capstone-server-auth/refresh_token: "Refreshed successfully"',
-      type: "success",
+    return response.status(200).json({
+      message: "Refreshed tokens successfully @ auth/refresh_token",
+      type: "200 OK",
       accessToken,
     });
   } catch (error) {
     response.status(500).json({
-      type: "error",
-      message: 'capstone-server-auth/refresh_token: "Error refreshing token"',
+      type: "500 Internal Server Error",
+      message: "Error refreshing tokens @ auth/refresh_token",
       error,
     });
   }
@@ -380,8 +367,8 @@ const getUserAssets = async (request, response) => {
       const games = await getAllGames(request.user[0]);
 
       return response.json({
-        message: 'capstone-server-auth/protected: "You are logged in"',
-        type: "success",
+        message: `You are logged in as ${request.user[0].email} @ auth/protected`,
+        type: "200 OK",
         user: request.user,
         maps: maps,
         chars: chars,
@@ -390,15 +377,14 @@ const getUserAssets = async (request, response) => {
     }
 
     // if user not in request, return error
-    return response.status(500).json({
-      message: 'capstone-server-auth/protected: "You are not logged in"',
-      type: "error",
+    return response.status(401).json({
+      message: "You are not logged in @ auth/protected",
+      type: "401 Unauthorized",
     });
   } catch (error) {
     response.status(500).json({
-      type: "error",
-      message:
-        'capstone-server-auth/protected: "Error getting protected route"',
+      type: "500 Internal Server Error",
+      message: "Error getting protected route @ auth/protected",
       error,
     });
   }

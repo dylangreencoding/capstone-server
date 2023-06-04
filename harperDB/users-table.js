@@ -1,12 +1,9 @@
 const axios = require("axios");
 
 async function searchUsers(email) {
-  console.log("searching users");
-
   const dbUrl = process.env.HARPERDB_URL;
   const dbPw = process.env.HARPERDB_PW;
   if (!dbUrl || !dbPw) return null;
-  console.log(email, dbUrl, dbPw);
 
   const search_value = email;
 
@@ -122,8 +119,6 @@ async function findById(id) {
 }
 
 async function addRefresh(id, refresh_token) {
-  console.log("trying to add refresh token", id, refresh_token);
-
   const dbUrl = process.env.HARPERDB_URL;
   const dbPw = process.env.HARPERDB_PW;
   if (!dbUrl || !dbPw) return null;
@@ -159,8 +154,6 @@ async function addRefresh(id, refresh_token) {
 }
 
 async function updateValidationCode(id, code) {
-  console.log("trying to updateValidationCode", id, code);
-
   const dbUrl = process.env.HARPERDB_URL;
   const dbPw = process.env.HARPERDB_PW;
   if (!dbUrl || !dbPw) return null;
@@ -196,8 +189,6 @@ async function updateValidationCode(id, code) {
 }
 
 async function updatePassword(id, passwordHash) {
-  console.log("trying to updatePassword", id, passwordHash);
-
   const dbUrl = process.env.HARPERDB_URL;
   const dbPw = process.env.HARPERDB_PW;
   if (!dbUrl || !dbPw) return null;

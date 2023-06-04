@@ -26,21 +26,21 @@ const saveGame = async (request, response) => {
         gameId = await updateGame(request.body);
         game = await findGame(gameId.update_hashes[0]);
       }
-      return response.json({
-        message: 'capstone-server/game/save: "Game saved successfully"',
-        type: "success",
+      return response.status(200).json({
+        message: "Game saved successfully @ game/save",
+        type: "200 OK",
         game: game[0],
       });
     }
     // if user not in request, return error
     return response.status(500).json({
-      message: 'capstone-server/game/save: "You are not logged in"',
-      type: "error",
+      message: "You are not logged in @ game/save",
+      type: "500 Internal Server Error",
     });
   } catch (error) {
     response.status(500).json({
-      type: "error",
-      message: 'capstone-server/game/save: "Error getting protected route"',
+      type: "500 Internal Server Error",
+      message: "Error getting protected route @ game/save",
       error,
     });
   }
@@ -75,21 +75,21 @@ const deleteExistingGame = async (request, response) => {
 
       const updatedGame = await findGame(game.id);
 
-      return response.json({
-        message: 'capstone-server/game/delete: "Game deleted successfully"',
-        type: "success",
+      return response.status(200).json({
+        message: "Game deleted successfully @ game/delete",
+        type: "200 OK",
         game: updatedGame,
       });
     }
     // if user not in request, return error
     return response.status(500).json({
-      message: 'capstone-server/game/delete: "You are not logged in"',
-      type: "error",
+      message: "You are not logged in @ game/delete",
+      type: "500 Internal Server Error",
     });
   } catch (error) {
     response.status(500).json({
-      type: "error",
-      message: 'capstone-server/game/delete: "Error getting protected route"',
+      type: "500 Internal Server Error",
+      message: "Error getting protected route @ game/delete",
       error,
     });
   }
@@ -114,28 +114,28 @@ const joinExistingGame = async (request, response) => {
         await joinGame(game[0]);
         game = await findGame(request.body.id);
 
-        return response.json({
-          message: 'capstone-server/game/join: "Game joined successfully"',
-          type: "success",
+        return response.status(200).json({
+          message: "Game joined successfully @ game/join",
+          type: "200 OK",
           game: game,
         });
       } else {
         // if game not found, return error
         return response.status(500).json({
-          message: 'capstone-server/game/join: "No game by that id"',
-          type: "error",
+          message: "No game with that id @ game/join",
+          type: "500 Internal Server Error",
         });
       }
     }
     // if user not in request, return error
     return response.status(500).json({
-      message: 'capstone-server/game/join: "You are not logged in"',
-      type: "error",
+      message: "You are not logged in @ game/join",
+      type: "500 Internal Server Error",
     });
   } catch (error) {
     response.status(500).json({
-      type: "error",
-      message: 'capstone-server/game/join: "Error getting protected route"',
+      message: "Error getting protected route @ game/join",
+      type: "500 Internal Server Error",
       error,
     });
   }
@@ -156,23 +156,21 @@ const removePlayer = async (request, response) => {
         updatedGame = await findGame(gameUpdate.update_hashes[0]);
       }
 
-      return response.json({
-        message:
-          'capstone-server/game/remove-player: "Player removed successfully"',
-        type: "success",
+      return response.status(200).json({
+        message: "Player removed successfully @ game/remove-player",
+        type: "200 OK",
         game: updatedGame[0],
       });
     }
     // if user not in request, return error
     return response.status(500).json({
-      message: 'capstone-server/game/remove-player: "You are not logged in"',
-      type: "error",
+      message: "You are not logged in @ game/remove-player",
+      type: "500 Internal Server Error",
     });
   } catch (error) {
     response.status(500).json({
-      type: "error",
-      message:
-        'capstone-server/game/remove-player: "Error getting protected route"',
+      type: "500 Internal Server Error",
+      message: "Error getting protected route @ game/remove-player",
       error,
     });
   }
