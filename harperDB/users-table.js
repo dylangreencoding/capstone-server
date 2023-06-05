@@ -30,7 +30,7 @@ async function searchUsers(email) {
     const response = await axios(config);
     return response.data;
   } catch (error) {
-    console.log("WTF???");
+    console.log(error);
   }
 }
 

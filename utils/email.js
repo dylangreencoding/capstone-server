@@ -1,27 +1,23 @@
-const { createTransport } = require('nodemailer');
+const { createTransport } = require("nodemailer");
 
+async function asyncSendMail(user, validationCode) {
+  const transporter = createTransport({
+    service: "gmail",
+    auth: {
+      type: "OAuth2",
+      user: process.env.MAIL_USERNAME,
+      pass: process.env.MAIL_PASSWORD,
+      clientId: process.env.OAUTH_CLIENT_ID,
+      clientSecret: process.env.OAUTH_CLIENT_SECRET,
+      refreshToken: process.env.OAUTH_REFRESH_TOKEN,
+    },
+  });
 
-const transporter = createTransport({
-  service: 'gmail',
-  auth: {
-    type: 'OAuth2',
-        user: process.env.MAIL_USERNAME,
-        pass: process.env.MAIL_PASSWORD,
-        clientId: process.env.OAUTH_CLIENT_ID,
-        clientSecret: process.env.OAUTH_CLIENT_SECRET,
-        refreshToken: process.env.OAUTH_REFRESH_TOKEN
-  },
-})
-
-const validateEmailTemplate = (user, validationCode) => {
   const email = user.email;
-  const copyId = () => {
-    navigator.clipboard.writeText(validationCode);
-  }
-  return {
+  const mailTemplate = {
     from: `Mail - <${process.env.MAIL_USERNAME}>`,
     to: email,
-    subject: 'Verification Code',
+    subject: "Capstone",
     html: `
     <h2>Verification Code</h2>
     <p>Copy and paste this code under <strong>Verification Code</strong>.</p>
@@ -29,11 +25,14 @@ const validateEmailTemplate = (user, validationCode) => {
     <small>${validationCode}</small>
     <br />
     <p>Thanks,</p>
-    <p>Capstone Creators</p>`,
-  }
+    <p>Dylan</p>`,
+  };
+
+  const info = await transporter.sendMail(mailTemplate);
+
+  return info;
 }
 
 module.exports = {
-  transporter,
-  validateEmailTemplate,
-}
+  asyncSendMail,
+};
