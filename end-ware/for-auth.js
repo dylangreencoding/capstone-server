@@ -41,37 +41,22 @@ const createAccount = async (request, response) => {
     // if user exists, return error
     if (user.length !== 0) {
       return response.status(400).json({
-        message: `User email already on record @ auth/create-account"`,
+        message: `User email already on record @ auth/create-account`,
         type: "400 Bad Request",
       });
     }
+
     // if user doesn't exist, create new user
     // hash (encrypt) the pw
-    // const passwordHash = await hash(password, 10);
-    const unverifiedAccountPassword = "";
+    const passwordHash = await hash(password, 10);
     // save user to db
-    await addUser(name, birthYear, email, unverifiedAccountPassword);
-    user = await searchUsers(email);
-    // add validation code to user in db
-    const validationCode = createValidationToken(user[0].id);
-    await updateValidationCode(user[0].id, validationCode);
+    await addUser(name, birthYear, email, passwordHash);
 
-    //send validation code to user email
-    //send validation code to user email
-    try {
-      const emailInfo = await asyncSendMail(user[0], validationCode);
-      console.log(emailInfo);
-
-      return response.status(200).json({
-        message: "Email sent successfully @ auth/resend-validation-email",
-        type: "200 OK",
-      });
-    } catch {
-      return response.status(502).json({
-        message: "Failed to send email @ auth/resend-validation-email",
-        type: "502 Bad Gateway",
-      });
-    }
+    // return response if successful
+    return response.status(200).json({
+      message: "User account created successfully @ auth/create-account",
+      type: "200 OK",
+    });
   } catch (error) {
     response.status(500).json({
       type: "500 Internal Server Error",
