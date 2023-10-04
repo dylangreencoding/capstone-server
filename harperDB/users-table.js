@@ -35,8 +35,6 @@ async function searchUsers(email) {
 }
 
 async function addUser(name, birthYear, email, password, validationCode) {
-  console.log("trying to add user");
-
   const dbUrl = process.env.HARPERDB_URL;
   const dbPw = process.env.HARPERDB_PW;
   if (!dbUrl || !dbPw) return null;
@@ -137,10 +135,10 @@ async function addRefresh(id, refresh_token) {
 
   const config = {
     method: "post",
-    url: "https://chat-tabletop.harperdbcloud.com",
+    url: dbUrl,
     headers: {
       "Content-Type": "application/json",
-      Authorization: "Basic ZHlsYW5ncmVlbmNvZGluZzpTcGVjaWFsSzkh",
+      Authorization: dbPw,
     },
     data: data,
   };
@@ -172,10 +170,10 @@ async function updateValidationCode(id, code) {
 
   const config = {
     method: "post",
-    url: "https://chat-tabletop.harperdbcloud.com",
+    url: dbUrl,
     headers: {
       "Content-Type": "application/json",
-      Authorization: "Basic ZHlsYW5ncmVlbmNvZGluZzpTcGVjaWFsSzkh",
+      Authorization: dbPW,
     },
     data: data,
   };
@@ -207,10 +205,10 @@ async function updatePassword(id, passwordHash) {
 
   const config = {
     method: "post",
-    url: "https://chat-tabletop.harperdbcloud.com",
+    url: dbUrl,
     headers: {
       "Content-Type": "application/json",
-      Authorization: "Basic ZHlsYW5ncmVlbmNvZGluZzpTcGVjaWFsSzkh",
+      Authorization: dbPW,
     },
     data: data,
   };

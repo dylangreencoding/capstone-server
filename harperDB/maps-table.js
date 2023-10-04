@@ -1,8 +1,6 @@
 const axios = require("axios");
 
 async function createMap(map) {
-  console.log("trying to add map to db");
-
   const dbUrl = process.env.HARPERDB_URL;
   const dbPw = process.env.HARPERDB_PW;
   if (!dbUrl || !dbPw) return null;
@@ -33,8 +31,6 @@ async function createMap(map) {
 }
 
 async function updateMap(map) {
-  console.log("trying to update map");
-
   const dbUrl = process.env.HARPERDB_URL;
   const dbPw = process.env.HARPERDB_PW;
   if (!dbUrl || !dbPw) return null;
@@ -80,8 +76,6 @@ async function updateMap(map) {
 }
 
 async function deleteMap(map) {
-  console.log("trying to delete map");
-
   const dbUrl = process.env.HARPERDB_URL;
   const dbPw = process.env.HARPERDB_PW;
   if (!dbUrl || !dbPw) return null;

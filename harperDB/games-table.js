@@ -1,7 +1,6 @@
 const axios = require("axios");
 
 async function createGame(game) {
-  console.log("trying to add game to db");
 
   const dbUrl = process.env.HARPERDB_URL;
   const dbPw = process.env.HARPERDB_PW;
@@ -33,7 +32,6 @@ async function createGame(game) {
 }
 
 async function updateGame(game) {
-  console.log("trying to update game");
 
   const dbUrl = process.env.HARPERDB_URL;
   const dbPw = process.env.HARPERDB_PW;
@@ -82,7 +80,6 @@ async function updateGame(game) {
 }
 
 async function deleteGame(game) {
-  console.log("trying to delete game");
 
   const dbUrl = process.env.HARPERDB_URL;
   const dbPw = process.env.HARPERDB_PW;
@@ -114,7 +111,6 @@ async function deleteGame(game) {
 }
 
 async function addGameToUser(user, gameId) {
-  console.log("trying to add game to user");
 
   const games = user.games;
   games.push(gameId);
@@ -154,8 +150,6 @@ async function addGameToUser(user, gameId) {
 }
 
 async function removeGameFromUser(user, game) {
-  console.log("trying to remove game from user");
-  console.log(game);
 
   const gameId = game.id;
   const games = user.games.filter((game) => {
@@ -197,7 +191,6 @@ async function removeGameFromUser(user, game) {
 }
 
 async function removeUserFromGame(user, game) {
-  console.log("trying to remove user from game");
 
   const userId = user.id;
   let players = game.players;
@@ -288,7 +281,6 @@ async function findGame(id) {
 }
 
 async function joinGame(game) {
-  console.log("trying to add player to game");
 
   const dbUrl = process.env.HARPERDB_URL;
   const dbPw = process.env.HARPERDB_PW;
