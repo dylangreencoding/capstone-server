@@ -173,13 +173,14 @@ async function updateValidationCode(id, code) {
     url: dbUrl,
     headers: {
       "Content-Type": "application/json",
-      Authorization: dbPW,
+      Authorization: dbPw,
     },
     data: data,
   };
 
   try {
     const response = await axios(config);
+    console.log(response.data);
     return response.data;
   } catch (error) {
     console.log(error);
@@ -208,7 +209,7 @@ async function updatePassword(id, passwordHash) {
     url: dbUrl,
     headers: {
       "Content-Type": "application/json",
-      Authorization: dbPW,
+      Authorization: dbPw,
     },
     data: data,
   };
