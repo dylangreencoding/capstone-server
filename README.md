@@ -4,6 +4,14 @@ Visit the live website here:
 
 https://capstone-tabletop.herokuapp.com
 
+## A note from the developer
+
+My focus is front end development with React, but it was important to me to know how to build a fully functional JWT authorization server. I got a little carried away.
+
+It works well and is fairly clean and well organized.
+
+I've included env.text in case anyone ever wanted to play with this sucker. You would have to be crazy.
+
 ## Brief Guide
 
 index.js is the entry point for the application and is fairly well commented
@@ -21,16 +29,6 @@ utils/authorize-socket.js contains middleware for socket user authorization
 utils/email.js contains the scripts and configurations for using nodemailer
 
 utils/tokens.js contains functions for generating and sending JWT
-
-## A note from the developer
-
-My focus is front end development with React, but it was important to me to know how to build a fully functional JWT authorization server. I got a little carried away.
-
-The biggest improvement that could be made to this is to write it in TypeScript. I wrote it in JavaScript because I was learning TypeScript at the same time as I was learning Express, JWT, Socket.IO, etc. and it would have been too much at one time.
-
-It works well and is fairly clean and well organized.
-
-I've included env.text in case anyone ever wanted to play with this sucker. You would have to be crazy.
 
 ## Known Bug
 
